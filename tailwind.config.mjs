@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   content: [
     './app.vue',
     './pages/**/*.{vue,js,ts}',
@@ -13,4 +13,4 @@ module.exports = {
     },
   },
   plugins: [],
-}; 
+} 
