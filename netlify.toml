@@ -5,3 +5,6 @@
 [functions]
   directory = ".output/server"
   node_bundler = "esbuild"
+  
+[build.environment]
+  NODE_VERSION = "20"
