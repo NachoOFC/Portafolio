@@ -2,17 +2,10 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  css: ['@/assets/tailwind.css'],
-  build: {
-    postcss: {
-      plugins: {
-        tailwindcss: {},
-        autoprefixer: {},
-      },
-    },
-  },
-  compatibility: {
-    // For Tailwind 4+ compatibility
-    modern: true,
-  },
+  css: [
+    'bootstrap/dist/css/bootstrap.min.css',
+    '@fortawesome/fontawesome-free/css/all.min.css',
+    'aos/dist/aos.css'
+  ],
+  
 })

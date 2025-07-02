@@ -1,22 +1,16 @@
 <template>
-  <section class="hero">
-    <div class="hero-content">
-      <h1>¡Hola! Soy <span class="highlight">Ignacio</span></h1>
-      <p>Desarrollador web y creador de experiencias digitales.</p>
-      <a href="#proyectos" class="btn">Ver proyectos</a>
-    </div>
-  </section>
   <SobreMi />
+  <div class="text-center my-4">
+    <a href="#proyectos" class="btn btn-success btn-lg">Ver proyectos</a>
+  </div>
   <section id="proyectos">
     <Proyectos />
   </section>
-  <Contacto />
 </template>
 
 <script setup lang="ts">
 import SobreMi from '@/components/SobreMi.vue'
 import Proyectos from '@/pages/proyectos.vue'
-import Contacto from '@/components/Contacto.vue'
 </script>
 
 <style scoped>
