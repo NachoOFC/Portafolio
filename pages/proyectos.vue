@@ -79,14 +79,10 @@ const proyectos = [
     imagen: '/moon.png'
   },
   {
-    titulo: 'E‑commerce UI',
-    descripcion: 'Interfaz de tienda online con Vue y Bootstrap.',
-    link: '#'
-  },
-  {
-    titulo: 'Blog Minimalista',
-    descripcion: 'Blog con soporte para markdown y dark mode.',
-    link: '#'
+    titulo: 'Videojuego',
+    descripcion: 'Un videojuego desarrollado con Python en mis años de aprendizaje. dejo el repositorio con el codigo del juego',
+    link: 'https://github.com/NachoOFC/Videojuego',
+    imagen: '/Videojuego.png'
   }
 ]
 </script>
