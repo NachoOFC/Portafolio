@@ -58,7 +58,7 @@
     <div class="max-w-3xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-gradient text-center mb-4">🏆 Hackatón TICSUR 2024</h2>
       <p class="text-center text-lg text-gray-300 mb-6">
-        Fuimos ganadores del 2º lugar en la Hackatón TICSUR 2024. Aquí puedes ver el desafío y algunas imágenes del evento.
+        Fuimos ganadores del 2º lugar en la Hackatón TICSUR 2024 Temuco. Aquí puedes ver el desafío y algunas imágenes del evento.
       </p>
       <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-6">
         <img src="/hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full" />
