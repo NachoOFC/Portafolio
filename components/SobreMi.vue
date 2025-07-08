@@ -28,9 +28,9 @@
       <div class="w-full flex flex-col items-center mt-8 mb-4">
         <h3 class="text-lg font-bold text-gradient mb-3">Tecnologías que conozco</h3>
         <div class="w-full overflow-x-hidden">
-          <div class="flex gap-6 animate-tech-scroll hover:pause-scroll py-2" :style="{ width: techIcons.length * 2 * 56 + 'px' }">
+          <div class="flex gap-6 animate-tech-scroll py-2" :style="{ width: techIcons.length * 2 * 56 + 'px' }">
             <template v-for="i in 2">
-              <img v-for="icon in techIcons" :key="icon + '-' + i" :src="`/iconos/${icon}`" :alt="icon.split('.')[0]" class="h-10 w-10 object-contain opacity-80 hover:opacity-100 hover:scale-110 transition duration-200" />
+              <img v-for="icon in techIcons" :key="icon + '-' + i" :src="`/iconos/${icon}`" :alt="icon.split('.')[0]" class="h-10 w-10 object-contain opacity-80" />
             </template>
           </div>
         </div>

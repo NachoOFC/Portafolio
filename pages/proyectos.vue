@@ -73,7 +73,7 @@ export default {
         },
         {
           titulo: 'Landing\u00A0Page',
-          descripcion: 'Una Landing page hecha con mi equipo de trabajo.',
+          descripcion: 'Una Landing page hecha con mi equipo de trabajo.(en desarrollo) donde puden ver nuestros diferentes ofertas y servicios',
           link: 'https://moon-systems.netlify.app/',
           imagen: '/moon.png',
           tecnologias: ['Astro', 'React']
