@@ -3,6 +3,10 @@
   <div class="flex justify-center my-8">
     <a href="#proyectos" class="px-8 py-3 border-2 border-blue-500 text-blue-400 rounded-full font-bold hover:bg-blue-600 hover:text-white transition bg-transparent" style="background: transparent; box-shadow: none;">Ver proyectos</a>
   </div>
+  <div class="w-full flex justify-center mb-8">
+    <div class="h-1 w-64 rounded-full bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 opacity-80"></div>
+  </div>
+  <Trayectoria />
   <section id="proyectos">
     <Proyectos />
   </section>
@@ -50,11 +54,27 @@
       </div>
     </div>
   </section>
+  <section id="hackaton" class="py-12 bg-gray-900 text-white">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gradient text-center mb-4">🏆 Hackatón TICSUR 2024</h2>
+      <p class="text-center text-lg text-gray-300 mb-6">
+        Fuimos ganadores del 2º lugar en la Hackatón TICSUR 2024. Aquí puedes ver el desafío y algunas imágenes del evento.
+      </p>
+      <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-6">
+        <img src="/hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full" />
+        <img src="/hackaton/hackaton.jpg" alt="Hackatón TICSUR" class="rounded-xl shadow-lg max-w-xs w-full" />
+      </div>
+      <div class="flex justify-center">
+        <a href="/hackaton/Desafio TICSur 2024.pdf" target="_blank" rel="noopener" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-green-400 hover:to-blue-500 text-white rounded-full font-bold shadow transition text-center">Ver desafío (PDF)</a>
+      </div>
+    </div>
+  </section>
 </template>
 
 <script>
 import SobreMi from '@/components/SobreMi.vue'
 import Proyectos from '@/pages/proyectos.vue'
+import Trayectoria from '@/components/Trayectoria.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -62,7 +82,7 @@ import 'swiper/css/pagination';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 export default {
-  components: { SobreMi, Proyectos, Swiper, SwiperSlide },
+  components: { SobreMi, Proyectos, Trayectoria, Swiper, SwiperSlide },
   data() {
     return {
       certificados: [
@@ -79,6 +99,12 @@ export default {
         { nombre: 'Node.js esencial 2018', file: 'CertificadoDeFinalizacion_Node.js esencial 2018.pdf', url: '/Certificados/CertificadoDeFinalizacion_Node.js%20esencial%202018.pdf', imagen: '/Certificados/Node.png' },
         { nombre: 'Fundamentos de IA y redes neuronales', file: 'CertificadoDeFinalizacion_Fundamentos de Inteligencia artificial Redes neuronales.pdf', url: '/Certificados/CertificadoDeFinalizacion_Fundamentos%20de%20Inteligencia%20artificial%20Redes%20neuronales.pdf', imagen: '/Certificados/Fundamentos.png' },
         { nombre: 'Depura el código Node', file: 'CertificadoDeFinalizacion_Depura el codigo Node.pdf', url: '/Certificados/CertificadoDeFinalizacion_Depura%20el%20codigo%20Node.pdf', imagen: '/Certificados/Depura.png' },
+      ],
+      trayectoria: [
+        { year: '2022', title: 'Primer trabajo', subtitle: 'Desarrollador Web Jr.', desc: 'Comencé mi carrera profesional en una empresa de tecnología, aprendiendo y creciendo en el mundo del desarrollo web.' },
+        { year: '2023', title: 'Certificación Vue.js', subtitle: '', desc: 'Obtuve mi primera certificación en Vue.js, consolidando mis conocimientos en frameworks modernos.' },
+        { year: '2024', title: 'Proyecto freelance', subtitle: 'Web para PyME', desc: 'Desarrollé un sitio web completo para una pequeña empresa, mejorando su presencia digital.' },
+        { year: '2025', title: 'Buscando nuevas oportunidades', subtitle: '', desc: 'Actualmente abierto a nuevos retos y proyectos interesantes.' }
       ],
       modalAbierto: false,
       modalImagen: '',

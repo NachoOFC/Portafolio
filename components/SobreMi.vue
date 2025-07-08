@@ -1,6 +1,6 @@
 <template>
-  <section class="py-12 bg-gray-900 text-white">
-    <div class="max-w-xl mx-auto px-4 flex flex-col items-center">
+  <section class="min-h-screen flex items-center justify-center py-12 bg-gray-900 text-white">
+    <div class="max-w-4xl w-full mx-auto px-4 flex flex-col items-center">
       <img src="/yo.jpg" alt="Ignacio" class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg mb-4" />
       <div class="flex flex-row items-center justify-center gap-4 mb-4">
         <a href="https://github.com/NachoOFC" target="_blank" rel="noopener" class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
@@ -26,7 +26,7 @@
         Soy Ignacio, desarrollador web apasionado por crear experiencias digitales atractivas y funcionales. Me especializo en Vue, Nuxt y tecnologías modernas de frontend.
       </p>
       <div class="flex justify-center mt-6 w-full">
-        <div class="bg-gradient-card rounded-xl shadow-lg px-8 py-4 flex flex-col items-center min-w-[320px] w-full max-w-lg">
+        <div class="bg-gradient-card rounded-2xl shadow-2xl px-10 py-6 flex flex-col items-center min-w-[320px] w-full max-w-lg border border-blue-900/40 backdrop-blur-md">
           <div class="text-gradient font-bold uppercase text-sm mb-2">MI STACK</div>
           <div class="flex flex-wrap gap-4 justify-center">
             <span class="flex items-center bg-gray-800 text-gray-200 rounded-full px-4 py-1 font-medium gap-2 border border-gray-700 hover:scale-105 hover:shadow-lg transition hover:border-blue-400" v-for="stack in stacks" :key="stack.label">
@@ -179,5 +179,11 @@ export default {
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
+}
+.bg-gradient-card {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.95));
+  border: 1.5px solid rgba(59, 130, 246, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.25);
+  backdrop-filter: blur(8px);
 }
 </style> 
