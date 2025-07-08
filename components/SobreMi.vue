@@ -25,6 +25,16 @@
         Desarrollador web y creador de experiencias digitales.<br>
         Soy Ignacio, desarrollador web apasionado por crear experiencias digitales atractivas y funcionales. Me especializo en Vue, Nuxt y tecnologías modernas de frontend.
       </p>
+      <div class="w-full flex flex-col items-center mt-8 mb-4">
+        <h3 class="text-lg font-bold text-gradient mb-3">Tecnologías que conozco</h3>
+        <div class="w-full overflow-x-hidden">
+          <div class="flex gap-6 animate-tech-scroll hover:pause-scroll py-2" :style="{ width: techIcons.length * 2 * 56 + 'px' }">
+            <template v-for="i in 2">
+              <img v-for="icon in techIcons" :key="icon + '-' + i" :src="`/iconos/${icon}`" :alt="icon.split('.')[0]" class="h-10 w-10 object-contain opacity-80 hover:opacity-100 hover:scale-110 transition duration-200" />
+            </template>
+          </div>
+        </div>
+      </div>
       <div class="flex justify-center mt-6 w-full">
         <div class="bg-gradient-card rounded-2xl shadow-2xl px-10 py-6 flex flex-col items-center min-w-[320px] w-full max-w-lg border border-blue-900/40 backdrop-blur-md">
           <div class="text-gradient font-bold uppercase text-sm mb-2">MI STACK</div>
@@ -66,6 +76,9 @@ export default {
         { label: 'JavaScript', icon: '/iconos/javascript.svg' },
         { label: 'PostgreSQL', icon: '/iconos/postgresql.svg' },
         { label: 'GitHub', icon: '/iconos/github_dark.svg' }
+      ],
+      techIcons: [
+        'nuxt.svg', 'vue.svg', 'javascript.svg', 'postgresql.svg', 'github_dark.svg', 'react_dark.svg', 'astro_dark.svg', 'python.svg', 'php_dark.svg', 'firebase.svg', 'graphql.svg', 'java.svg', 'html5.svg', 'css_old.svg', 'tailwindcss.svg'
       ]
     }
   },
@@ -185,5 +198,16 @@ export default {
   border: 1.5px solid rgba(59, 130, 246, 0.18);
   box-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.25);
   backdrop-filter: blur(8px);
+}
+@keyframes tech-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-tech-scroll {
+  display: flex;
+  animation: tech-scroll 18s linear infinite;
+}
+.hover\:pause-scroll:hover {
+  animation-play-state: paused;
 }
 </style> 

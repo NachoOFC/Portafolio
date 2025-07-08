@@ -70,13 +70,21 @@
         imágenes del evento.
       </p>
       <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-6">
-        <img src="/Hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full" />
-        <img src="/Hackaton/hackaton.jpg" alt="Hackatón TICSUR" class="rounded-xl shadow-lg max-w-xs w-full" />
+        <img src="/Hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full cursor-pointer hover:scale-105 transition" @click="abrirHackatonModal('/Hackaton/ganadores.jpg', 'Ganadores Hackatón TICSUR 2024')" />
+        <img src="/Hackaton/hackaton.jpg" alt="Hackatón TICSUR" class="rounded-xl shadow-lg max-w-xs w-full cursor-pointer hover:scale-105 transition" @click="abrirHackatonModal('/Hackaton/hackaton.jpg', 'Hackatón TICSUR 2024')" />
       </div>
       <div class="flex justify-center">
         <a href="/Hackaton/Desafio TICSur 2024.pdf" target="_blank" rel="noopener"
           class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-green-400 hover:to-blue-500 text-white rounded-full font-bold shadow transition text-center">Ver
           desafío (PDF)</a>
+      </div>
+      <div v-if="hackatonModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80" @click.self="cerrarHackatonModal">
+        <div class="relative max-w-3xl w-full mx-4">
+          <button @click="cerrarHackatonModal"
+            class="absolute top-2 right-2 text-white text-3xl font-bold bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-80 transition">&times;</button>
+          <img :src="hackatonModalImg" :alt="hackatonModalDesc" class="w-full max-h-[80vh] object-contain rounded-xl shadow-2xl border-4 border-blue-400 bg-white" />
+          <div class="text-center text-white mt-4 text-lg font-semibold">{{ hackatonModalDesc }}</div>
+        </div>
       </div>
     </div>
   </section>
@@ -120,6 +128,9 @@ export default {
       modalAbierto: false,
       modalImagen: '',
       modalTitulo: '',
+      hackatonModalOpen: false,
+      hackatonModalImg: '',
+      hackatonModalDesc: '',
     }
   },
   mounted() {
@@ -137,6 +148,16 @@ export default {
       this.modalAbierto = false;
       this.modalImagen = '';
       this.modalTitulo = '';
+    },
+    abrirHackatonModal(img, desc) {
+      this.hackatonModalImg = img;
+      this.hackatonModalDesc = desc;
+      this.hackatonModalOpen = true;
+    },
+    cerrarHackatonModal() {
+      this.hackatonModalOpen = false;
+      this.hackatonModalImg = '';
+      this.hackatonModalDesc = '';
     }
   }
 }
