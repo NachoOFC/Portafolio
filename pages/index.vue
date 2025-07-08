@@ -1,7 +1,9 @@
 <template>
   <SobreMi />
   <div class="flex justify-center my-8">
-    <a href="#proyectos" class="px-8 py-3 border-2 border-blue-500 text-blue-400 rounded-full font-bold hover:bg-blue-600 hover:text-white transition bg-transparent" style="background: transparent; box-shadow: none;">Ver proyectos</a>
+    <a href="#proyectos"
+      class="px-8 py-3 border-2 border-blue-500 text-blue-400 rounded-full font-bold hover:bg-blue-600 hover:text-white transition bg-transparent"
+      style="background: transparent; box-shadow: none;">Ver proyectos</a>
   </div>
   <div class="w-full flex justify-center mb-8">
     <div class="h-1 w-64 rounded-full bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 opacity-80"></div>
@@ -14,29 +16,32 @@
     <div class="max-w-6xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-gradient text-center mb-8">Certificados</h2>
       <div class="relative" style="min-height: 420px;">
-        <swiper
-          :slides-per-view="3"
-          :space-between="30"
-          :loop="true"
-          :centered-slides="true"
+        <swiper :slides-per-view="3" :space-between="30" :loop="true" :centered-slides="true"
           :pagination="{ clickable: true }"
-          :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }"
-          class="mySwiper"
-          style="width:100%; min-height: 420px;"
-        >
+          :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }" class="mySwiper"
+          style="width:100%; min-height: 420px;">
           <swiper-slide v-for="cert in certificados" :key="cert.file" class="h-full flex items-stretch">
             <div :class="[
               'bg-gray-800 bg-opacity-90 rounded-2xl shadow-lg flex flex-col items-center border border-gray-700 overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl w-72 min-w-[288px] h-full',
               cert.destacado ? 'border-4 border-yellow-400 shadow-yellow-400/60 relative' : ''
             ]" data-aos="fade-up">
-              <span v-if="cert.destacado" class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded-full text-xs shadow">Destacado</span>
-              <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer" @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
-                <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre" class="object-contain rounded-lg shadow max-h-48 max-w-full transition-transform duration-300 group-hover:scale-110" />
-                <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <span v-if="cert.destacado"
+                class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded-full text-xs shadow">Destacado</span>
+              <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer"
+                @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
+                <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre"
+                  class="object-contain rounded-lg shadow max-h-48 max-w-full transition-transform duration-300 group-hover:scale-110" />
+                <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg"
+                  class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
               </div>
               <div class="flex-1 flex flex-col justify-between p-6 w-full">
-                <div class="font-semibold text-lg text-center mb-2 min-h-[48px] flex items-center justify-center">{{ cert.nombre }}</div>
-                <a :href="cert.url" target="_blank" rel="noopener" class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold transition self-center">Ver certificado</a>
+                <div class="font-semibold text-lg text-center mb-2 min-h-[48px] flex items-center justify-center">{{
+                  cert.nombre }}</div>
+                <a :href="cert.url" target="_blank" rel="noopener"
+                  class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold transition self-center">Ver
+                  certificado</a>
               </div>
             </div>
           </swiper-slide>
@@ -45,10 +50,13 @@
         <div class="swiper-button-next custom-swiper-arrow"></div>
       </div>
       <!-- Modal para ver imagen grande -->
-      <div v-if="modalAbierto" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80" @click.self="cerrarModal">
+      <div v-if="modalAbierto" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"
+        @click.self="cerrarModal">
         <div class="relative max-w-3xl w-full mx-4">
-          <button @click="cerrarModal" class="absolute top-2 right-2 text-white text-3xl font-bold bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-80 transition">&times;</button>
-          <img :src="modalImagen" :alt="modalTitulo" class="w-full max-h-[80vh] object-contain rounded-xl shadow-2xl border-4 border-blue-400 bg-white" />
+          <button @click="cerrarModal"
+            class="absolute top-2 right-2 text-white text-3xl font-bold bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-80 transition">&times;</button>
+          <img :src="modalImagen" :alt="modalTitulo"
+            class="w-full max-h-[80vh] object-contain rounded-xl shadow-2xl border-4 border-blue-400 bg-white" />
           <div class="text-center text-white mt-4 text-lg font-semibold">{{ modalTitulo }}</div>
         </div>
       </div>
@@ -58,14 +66,17 @@
     <div class="max-w-3xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-gradient text-center mb-4">🏆 Hackatón TICSUR 2024</h2>
       <p class="text-center text-lg text-gray-300 mb-6">
-        Fuimos ganadores del 2º lugar en la Hackatón TICSUR 2024 Temuco. Aquí puedes ver el desafío y algunas imágenes del evento.
+        Fuimos ganadores del 2º lugar en la Hackatón TICSUR 2024 Temuco, Chile. Aquí puedes ver el desafío y algunas
+        imágenes del evento.
       </p>
       <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-6">
-        <img src="/hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full" />
-        <img src="/hackaton/hackaton.jpg" alt="Hackatón TICSUR" class="rounded-xl shadow-lg max-w-xs w-full" />
+        <img src="/Hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full" />
+        <img src="/Hackaton/hackaton.jpg" alt="Hackatón TICSUR" class="rounded-xl shadow-lg max-w-xs w-full" />
       </div>
       <div class="flex justify-center">
-        <a href="/hackaton/Desafio TICSur 2024.pdf" target="_blank" rel="noopener" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-green-400 hover:to-blue-500 text-white rounded-full font-bold shadow transition text-center">Ver desafío (PDF)</a>
+        <a href="/Hackaton/Desafio TICSur 2024.pdf" target="_blank" rel="noopener"
+          class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-green-400 hover:to-blue-500 text-white rounded-full font-bold shadow transition text-center">Ver
+          desafío (PDF)</a>
       </div>
     </div>
   </section>
