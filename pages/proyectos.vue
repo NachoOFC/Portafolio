@@ -1,7 +1,7 @@
 <template>
   <section class="py-12 bg-gray-900 text-white">
     <div class="max-w-6xl mx-auto px-4">
-      <h2 class="text-3xl font-bold text-green-400 text-center mb-8">
+      <h2 class="text-3xl font-bold text-gradient text-center mb-8">
         Proyectos
       </h2>
       <p class="text-center mb-8 text-gray-300">
@@ -106,4 +106,10 @@ export default {
 </script>
 
 <style scoped>
+.text-gradient {
+  background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 </style>

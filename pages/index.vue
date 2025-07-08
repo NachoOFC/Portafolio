@@ -8,37 +8,38 @@
   </section>
   <section id="certificados" class="py-12 bg-gray-900 text-white">
     <div class="max-w-6xl mx-auto px-4">
-      <h2 class="text-3xl font-bold text-blue-400 text-center mb-8">Certificados</h2>
-      <swiper
-        :slides-per-view="3"
-        :space-between="30"
-        :loop="true"
-        :centered-slides="true"
-        :pagination="{ clickable: true }"
-        :navigation="true"
-        class="mySwiper"
-        style="width:100%;"
-      >
-        <swiper-slide v-for="cert in certificados" :key="cert.file">
-          <div :class="[
-            'bg-gray-800 bg-opacity-90 rounded-2xl shadow-lg flex flex-col items-center border border-gray-700 overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl w-72 min-w-[288px]',
-            cert.destacado ? 'border-4 border-yellow-400 shadow-yellow-400/60 relative' : ''
-          ]" data-aos="fade-up">
-            <span v-if="cert.destacado" class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded-full text-xs shadow">Destacado</span>
-            <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer" @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
-              <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre" class="object-contain rounded-lg shadow max-h-48 max-w-full transition-transform duration-300 group-hover:scale-110" />
-              <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+      <h2 class="text-3xl font-bold text-gradient text-center mb-8">Certificados</h2>
+      <div class="relative" style="min-height: 420px;">
+        <swiper
+          :slides-per-view="3"
+          :space-between="30"
+          :loop="true"
+          :centered-slides="true"
+          :pagination="{ clickable: true }"
+          :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }"
+          class="mySwiper"
+          style="width:100%; min-height: 420px;"
+        >
+          <swiper-slide v-for="cert in certificados" :key="cert.file" class="h-full flex items-stretch">
+            <div :class="[
+              'bg-gray-800 bg-opacity-90 rounded-2xl shadow-lg flex flex-col items-center border border-gray-700 overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl w-72 min-w-[288px] h-full',
+              cert.destacado ? 'border-4 border-yellow-400 shadow-yellow-400/60 relative' : ''
+            ]" data-aos="fade-up">
+              <span v-if="cert.destacado" class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded-full text-xs shadow">Destacado</span>
+              <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer" @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
+                <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre" class="object-contain rounded-lg shadow max-h-48 max-w-full transition-transform duration-300 group-hover:scale-110" />
+                <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              </div>
+              <div class="flex-1 flex flex-col justify-between p-6 w-full">
+                <div class="font-semibold text-lg text-center mb-2 min-h-[48px] flex items-center justify-center">{{ cert.nombre }}</div>
+                <a :href="cert.url" target="_blank" rel="noopener" class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold transition self-center">Ver certificado</a>
+              </div>
             </div>
-            <div class="flex-1 flex flex-col p-6 w-full">
-              <div class="font-semibold text-lg text-center mb-2">{{ cert.nombre }}</div>
-              <a :href="cert.url" target="_blank" rel="noopener" class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold transition self-center">Ver certificado</a>
-            </div>
-          </div>
-        </swiper-slide>
-        <div class="swiper-pagination"></div>
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-button-next"></div>
-      </swiper>
+          </swiper-slide>
+        </swiper>
+        <div class="swiper-button-prev custom-swiper-arrow"></div>
+        <div class="swiper-button-next custom-swiper-arrow"></div>
+      </div>
       <!-- Modal para ver imagen grande -->
       <div v-if="modalAbierto" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80" @click.self="cerrarModal">
         <div class="relative max-w-3xl w-full mx-4">
@@ -105,28 +106,66 @@ export default {
 </script>
 
 <style>
-.swiper-button-next, .swiper-button-prev {
-  color: #2563eb !important;
-  background: rgba(30,41,59,0.7);
-  border-radius: 9999px;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.custom-swiper-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 50 !important;
-  pointer-events: auto !important;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3b82f6 60%, #10b981 100%);
+  color: #fff !important;
+  border-radius: 50%;
+  border: 2px solid #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.15);
+  transition: all 0.3s cubic-bezier(.4,2,.6,1);
 }
-.swiper-button-prev {
-  left: -24px;
+.custom-swiper-arrow:hover {
+  background: linear-gradient(135deg, #10b981 60%, #3b82f6 100%);
+  border-color: #10b981;
+  opacity: 1;
+  transform: translateY(-50%) scale(1.12);
 }
-.swiper-button-next {
-  right: -24px;
+.swiper-button-prev.custom-swiper-arrow {
+  left: -60px;
 }
-.swiper-button-prev svg {
-  transform: scaleX(-1);
+.swiper-button-next.custom-swiper-arrow {
+  right: -60px;
+}
+.swiper-button-prev::after, .swiper-button-next::after {
+  font-size: 18px !important;
+  font-weight: bold;
+}
+@media (max-width: 1200px) {
+  .swiper-button-prev.custom-swiper-arrow {
+    left: -30px;
+  }
+  .swiper-button-next.custom-swiper-arrow {
+    right: -30px;
+  }
+}
+@media (max-width: 900px) {
+  .swiper-button-prev.custom-swiper-arrow,
+  .swiper-button-next.custom-swiper-arrow {
+    left: 0 !important;
+    right: 0 !important;
+    width: 28px;
+    height: 28px;
+  }
+}
+@media (max-width: 768px) {
+  .swiper-button-next.custom-swiper-arrow, .swiper-button-prev.custom-swiper-arrow {
+    display: none !important;
+  }
+}
+.text-gradient {
+  background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style> 
