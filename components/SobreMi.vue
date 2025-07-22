@@ -150,10 +150,10 @@ export default {
 <style>
 .border-gradient {
   background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
-  padding: 2px;
+  padding: 1px;
 }
 .border-gradient img {
-  border: 2px solid #1f2937;
+  border: 1px solid #1f2937;
 }
 .text-gradient {
   background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
