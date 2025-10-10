@@ -13,16 +13,27 @@
     <Proyectos />
   </section>
   <section id="certificados" class="py-12 bg-gray-900 text-white">
-    <div class="max-w-6xl mx-auto px-4">
-      <h2 class="text-3xl font-bold text-gradient text-center mb-8">Certificados</h2>
-      <div class="relative" style="min-height: 420px;">
-        <swiper :slides-per-view="3" :space-between="30" :loop="true" :centered-slides="true"
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gradient text-center mb-8">Certificados</h2>
+      <div class="relative px-2 sm:px-0" style="min-height: 420px; padding-bottom: 40px;">
+        <swiper 
+          :modules="modules"
+          :slides-per-view="1" 
+          :space-between="20" 
+          :loop="true" 
+          :centered-slides="true"
           :pagination="{ clickable: true }"
-          :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }" class="mySwiper"
+          :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }"
+          :breakpoints="{
+            640: { slidesPerView: 1, spaceBetween: 20 },
+            768: { slidesPerView: 2, spaceBetween: 25 },
+            1024: { slidesPerView: 3, spaceBetween: 30 }
+          }"
+          class="mySwiper"
           style="width:100%; min-height: 420px;">
-          <swiper-slide v-for="cert in certificados" :key="cert.file" class="h-full flex items-stretch">
+          <swiper-slide v-for="cert in certificados" :key="cert.file" class="h-full flex items-stretch justify-center">
             <div :class="[
-              'bg-gray-800 bg-opacity-90 rounded-2xl shadow-lg flex flex-col items-center border border-gray-700 overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl w-72 min-w-[288px] h-full',
+              'bg-gray-800 bg-opacity-90 rounded-2xl shadow-lg flex flex-col items-center border border-gray-700 overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl w-full max-w-xs mx-auto h-full',
               cert.destacado ? 'border-4 border-yellow-400 shadow-yellow-400/60 relative' : ''
             ]" data-aos="fade-up">
               <span v-if="cert.destacado"
@@ -30,17 +41,17 @@
               <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer"
                 @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
                 <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre"
-                  class="object-contain rounded-lg shadow max-h-48 max-w-full transition-transform duration-300 group-hover:scale-110" />
+                  class="object-contain rounded-lg shadow max-h-48 max-w-full px-2 transition-transform duration-300 group-hover:scale-110" />
                 <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg"
                   class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
               </div>
-              <div class="flex-1 flex flex-col justify-between p-6 w-full">
-                <div class="font-semibold text-lg text-center mb-2 min-h-[48px] flex items-center justify-center">{{
+              <div class="flex-1 flex flex-col justify-between p-4 sm:p-6 w-full">
+                <div class="font-semibold text-base sm:text-lg text-center mb-2 min-h-[48px] flex items-center justify-center px-2">{{
                   cert.nombre }}</div>
                 <a :href="cert.url" target="_blank" rel="noopener"
-                  class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold transition self-center">Ver
+                  class="mt-2 px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold transition self-center text-sm sm:text-base">Ver
                   certificado</a>
               </div>
             </div>
@@ -95,6 +106,7 @@ import SobreMi from '@/components/SobreMi.vue'
 import Proyectos from '@/pages/proyectos.vue'
 import Trayectoria from '@/components/Trayectoria.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -104,6 +116,7 @@ export default {
   components: { SobreMi, Proyectos, Trayectoria, Swiper, SwiperSlide },
   data() {
     return {
+      modules: [Navigation, Pagination],
       certificados: [
         { nombre: 'Cuenta historias con los datos', file: 'CertificadoDeFinalizacion_Aprende data science Cuenta historias con los datos (1).pdf', url: '/Certificados/CertificadoDeFinalizacion_Aprende%20data%20science%20Cuenta%20historias%20con%20los%20datos%20(1).pdf', imagen: '/Certificados/aprendedatascience-CuentaHistorias.png' },
         { nombre: 'Certificado Microsoft', file: 'CertificadoMicrosoft.pdf', url: '/Certificados/CertificadoMicrosoft.pdf', imagen: '/Certificados/microsoft.png', destacado: true },
@@ -198,6 +211,27 @@ export default {
   font-size: 18px !important;
   font-weight: bold;
 }
+
+/* Estilos para paginación */
+.mySwiper :deep(.swiper-pagination) {
+  bottom: -10px !important;
+}
+
+.mySwiper :deep(.swiper-pagination-bullet) {
+  width: 10px;
+  height: 10px;
+  background: #3b82f6;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.mySwiper :deep(.swiper-pagination-bullet-active) {
+  background: #10b981;
+  opacity: 1;
+  width: 24px;
+  border-radius: 5px;
+}
+
 @media (max-width: 1200px) {
   .swiper-button-prev.custom-swiper-arrow {
     left: -30px;
