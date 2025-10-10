@@ -8,6 +8,7 @@
   <div class="w-full flex justify-center mb-8">
     <div class="h-1 w-64 rounded-full bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 opacity-80"></div>
   </div>
+  <Estadisticas />
   <Trayectoria />
   <section id="proyectos">
     <Proyectos />
@@ -105,6 +106,7 @@
 import SobreMi from '@/components/SobreMi.vue'
 import Proyectos from '@/pages/proyectos.vue'
 import Trayectoria from '@/components/Trayectoria.vue'
+import Estadisticas from '@/components/Estadisticas.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -113,7 +115,7 @@ import 'swiper/css/pagination';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 export default {
-  components: { SobreMi, Proyectos, Trayectoria, Swiper, SwiperSlide },
+  components: { SobreMi, Proyectos, Trayectoria, Estadisticas, Swiper, SwiperSlide },
   data() {
     return {
       modules: [Navigation, Pagination],
