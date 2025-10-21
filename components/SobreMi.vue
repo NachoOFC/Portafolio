@@ -62,7 +62,7 @@ export default {
       currentTextIndex: 0,
       typingSpeed: 150,
       deletingSpeed: 100,
-      pauseTime: 2000,
+      pauseTime: 3500, // Aumentado de 2000 a 3500ms (3.5 segundos)
       // Para el texto secundario
       fullTextSecondary: 'Desarrollador Web',
       shortTextSecondary: 'Programador Jr',
@@ -92,9 +92,8 @@ export default {
       this.typeText();
     },
     startTypingSecondary() {
-      setTimeout(() => {
-        this.typeTextSecondary();
-      }, 1000); // Comienza 1 segundo después del primer texto
+      // Empiezan al mismo tiempo
+      this.typeTextSecondary();
     },
     typeText() {
       const currentText = this.currentTextIndex === 0 ? this.fullText : this.shortText;
@@ -106,6 +105,8 @@ export default {
           this.isDeleting = false;
           this.currentTextIndex = this.currentTextIndex === 0 ? 1 : 0;
           this.isTyping = false;
+          // Sincronizar cambio de texto
+          this.currentTextIndexSecondary = this.currentTextIndex;
           setTimeout(() => this.typeText(), 500);
           return;
         }
@@ -128,7 +129,6 @@ export default {
         this.displayTextSecondary = currentText.substring(0, this.displayTextSecondary.length - 1);
         if (this.displayTextSecondary === '') {
           this.isDeletingSecondary = false;
-          this.currentTextIndexSecondary = this.currentTextIndexSecondary === 0 ? 1 : 0;
           this.isTypingSecondary = false;
           setTimeout(() => this.typeTextSecondary(), 500);
           return;
@@ -169,12 +169,12 @@ export default {
   background-clip: text;
 }
 .typing-text {
-  min-width: 160px;
   display: inline-block;
+  text-align: left;
 }
 .typing-text-secondary {
-  min-width: 140px;
   display: inline-block;
+  text-align: left;
 }
 .cursor {
   animation: blink 1s infinite;
