@@ -27,11 +27,12 @@
       </p>
       <div class="w-full flex flex-col items-center mt-8 mb-4">
         <h3 class="text-lg font-bold text-gradient mb-3">Tecnologías que conozco</h3>
-        <div class="w-full overflow-x-hidden">
-          <div class="flex gap-6 animate-tech-scroll py-2" :style="{ width: techIcons.length * 2 * 56 + 'px' }">
-            <template v-for="i in 2">
-              <img v-for="icon in techIcons" :key="icon + '-' + i" :src="`/iconos/${icon}`" :alt="icon.split('.')[0]" class="h-10 w-10 object-contain opacity-80" />
-            </template>
+        <div class="w-full overflow-hidden relative">
+          <div class="flex gap-6 animate-tech-scroll-infinite py-2">
+            <!-- Primer conjunto -->
+            <img v-for="(icon, index) in techIcons" :key="'first-' + index" :src="`/iconos/${icon}`" :alt="icon.split('.')[0]" class="h-10 w-10 object-contain opacity-80 flex-shrink-0" />
+            <!-- Segundo conjunto (duplicado para loop infinito) -->
+            <img v-for="(icon, index) in techIcons" :key="'second-' + index" :src="`/iconos/${icon}`" :alt="icon.split('.')[0]" class="h-10 w-10 object-contain opacity-80 flex-shrink-0" />
           </div>
         </div>
       </div>
@@ -206,6 +207,19 @@ export default {
 .animate-tech-scroll {
   display: flex;
   animation: tech-scroll 18s linear infinite;
+}
+.animate-tech-scroll-infinite {
+  display: flex;
+  animation: tech-scroll-infinite 30s linear infinite;
+  will-change: transform;
+}
+@keyframes tech-scroll-infinite {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-1 * (40px + 1.5rem) * 15));
+  }
 }
 .hover\:pause-scroll:hover {
   animation-play-state: paused;
