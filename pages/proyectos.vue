@@ -41,15 +41,31 @@
                   <span class="ml-1">{{ tech }}</span>
                 </span>
               </div>
-              <!-- Botón -->
-              <a
-                :href="proyecto.link"
-                target="_blank"
-                rel="noopener"
-                class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-5 rounded-lg mt-2 transition shadow"
-              >
-                Ver&nbsp;más
-              </a>
+              <!-- Botones: dinámicos según tipo de proyecto -->
+              <div class="mt-2 flex gap-3">
+                <a
+                  :href="proyecto.link"
+                  target="_blank"
+                  rel="noopener"
+                  :class="[
+                    'inline-block text-white font-bold py-2 px-4 rounded-lg transition shadow',
+                    proyecto.link.includes('github') 
+                      ? 'bg-gray-700 hover:bg-gray-600' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  ]"
+                >
+                  {{ proyecto.link.includes('github') ? 'Repositorio' : 'Ver más' }}
+                </a>
+                <a
+                  v-if="proyecto.demo"
+                  :href="proyecto.demo"
+                  target="_blank"
+                  rel="noopener"
+                  class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                >
+                  Ver juego
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -82,6 +98,7 @@ export default {
           titulo: 'Videojuego',
           descripcion: 'Un videojuego desarrollado con Python en mis años de aprendizaje. dejo el repositorio con el codigo del juego',
           link: 'https://github.com/NachoOFC/Videojuego',
+          demo: 'https://eljarl.netlify.app/',
           imagen: '/Videojuego.png',
           tecnologias: ['Python']
         }
