@@ -168,19 +168,24 @@ export default {
       comentarios: [],
       nuevoComentario: {
         nombre: '',
-        icono: 'programmer.png',
+        icono: 'telecommuting.gif',
         mensaje: ''
       },
       enviando: false,
       puedeComentar: false,
       dispositivo_id: null,
       iconos: [
-        'programmer.png',
+        'telecommuting.gif',
         'people.png',
+        'programmer.png',
+        'aliens.png',
         'woman.png',
         'cat.png',
         'dog.png',
-        'aliens.png'
+        'koala.png',
+        'rat.png',
+        'turtle.png'
+       
       ],
       proximoComentarioEn: null,
       editando: null,
@@ -318,7 +323,7 @@ export default {
           // Resetear formulario
           this.nuevoComentario = {
             nombre: '',
-            icono: 'programmer.png',
+            icono: 'telecommuting.gif',
             mensaje: ''
           };
           // Mostrar mensaje de éxito
