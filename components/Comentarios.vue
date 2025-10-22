@@ -227,7 +227,7 @@ export default {
       const ultimoLike = localStorage.getItem(ultimoLikeKey);
       this.puedeComentar = !!ultimoLike; // True si existe el timestamp
 
-      // Verificar límite de 1 comentario por 24hrs
+      // Verificar límite de 1 comentario por 24hrs (SOLO si fue aprobado)
       const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;
       const ultimoComentario = localStorage.getItem(ultimoComentarioKey);
       
@@ -240,6 +240,10 @@ export default {
           const tiempoRestante = veinticuatroHoras - tiempoTranscurrido;
           const horasRestantes = Math.ceil(tiempoRestante / (60 * 60 * 1000));
           this.proximoComentarioEn = horasRestantes;
+        } else {
+          // Si pasaron 24hrs, limpiar el localStorage
+          localStorage.removeItem(ultimoComentarioKey);
+          this.proximoComentarioEn = null;
         }
       }
     },
@@ -279,6 +283,27 @@ export default {
               }
             });
             this.guardarMisLikes();
+            
+            // IMPORTANTE: Limpiar bloqueo de 24hrs si el comentario fue eliminado/rechazado
+            const comentarioIds = new Set(this.comentarios.map(c => c.id));
+            Object.keys(this.misComentarios).forEach(id => {
+              if (!comentarioIds.has(parseInt(id))) {
+                // El comentario no existe en la BD, fue eliminado
+                delete this.misComentarios[id];
+              }
+            });
+            this.guardarMisComentarios();
+            
+            // Si no hay comentarios del usuario, limpiar el bloqueo de 24hrs
+            const tieneComentariosAprobados = this.comentarios.some(c => c.aprobado === true && this.misComentarios[c.id]);
+            if (!tieneComentariosAprobados) {
+              const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;
+              localStorage.removeItem(ultimoComentarioKey);
+              this.proximoComentarioEn = null;
+            }
+            
+            // Verificar si puede comentar
+            this.verificarSiPuedeComentar();
           }
         })
         .catch(err => console.error('Error cargando comentarios:', err));
@@ -538,6 +563,13 @@ export default {
           // Eliminar del localStorage
           delete this.misComentarios[id];
           this.guardarMisComentarios();
+          
+          // LIMPIAR BLOQUEO DE 24HRS (como si nunca hubiera comentado)
+          const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;
+          localStorage.removeItem(ultimoComentarioKey);
+          this.proximoComentarioEn = null;
+          this.verificarSiPuedeComentar();
+          
           alert('✅ Comentario eliminado');
         })
         .catch(err => {
