@@ -11,6 +11,9 @@
           <div v-if="proximoComentarioEn">
             ⏰ Podrás comentar en {{ proximoComentarioEn }} horas
           </div>
+          <div v-else-if="comentarios.some(c => misComentarios[c.id] && c.aprobado === false)">
+            ✏️ Termina o borra tu comentario pendiente para hacer uno nuevo
+          </div>
           <div v-else>
             💛 Primero debes dar like para comentar
           </div>
@@ -216,9 +219,8 @@ export default {
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
     window.addEventListener('likeGiven', () => {
-      setTimeout(() => {
-        this.verificarSiPuedeComentar();
-      }, 500);
+      // Actualizar inmediatamente sin espera
+      this.verificarSiPuedeComentar();
     });
   },
   methods: {
@@ -226,6 +228,19 @@ export default {
       const ultimoLikeKey = `portafolioUltimoLike_${this.dispositivo_id}`;
       const ultimoLike = localStorage.getItem(ultimoLikeKey);
       this.puedeComentar = !!ultimoLike; // True si existe el timestamp
+
+      // VERIFICAR: ¿Tiene algún comentario pendiente (sin aprobar)?
+      if (this.puedeComentar) {
+        const tieneComentarioPendiente = this.comentarios.some(c => 
+          this.misComentarios[c.id] && c.aprobado === false
+        );
+        
+        if (tieneComentarioPendiente) {
+          this.puedeComentar = false;
+          this.proximoComentarioEn = null;
+          return; // Exit, no puede comentar
+        }
+      }
 
       // Verificar límite de 1 comentario por 24hrs (SOLO si fue aprobado)
       const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;

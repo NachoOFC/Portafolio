@@ -156,7 +156,7 @@ export default {
       const ultimoLikeKey = `portafolioUltimoLike_${this.deviceId}`;
       localStorage.setItem(ultimoLikeKey, new Date().toISOString());
 
-      // Emitir evento global para Comentarios
+      // Emitir evento global para Comentarios (actualizar sin recargar)
       window.dispatchEvent(new Event('likeGiven'));
 
       // Enviar like al servidor
