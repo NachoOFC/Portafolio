@@ -34,7 +34,7 @@ exports.handler = async (event) => {
     // ============ CONTADORES ============
 
     // GET /contadores - obtener contadores
-    if (method === 'GET' && path === '/.netlify/functions/contadores') {
+    if (method === 'GET') {
       const result = await client.query(
         'SELECT tipo, cantidad FROM contadores ORDER BY tipo'
       );
@@ -54,11 +54,12 @@ exports.handler = async (event) => {
       };
     }
 
-    // POST /contadores - incrementar contadores
-    if (method === 'POST' && path === '/.netlify/functions/contadores') {
+    // POST - incrementar contadores O crear comentario
+    if (method === 'POST') {
       const body = JSON.parse(event.body);
-      const { action } = body;
+      const { action, dispositivo_id, nombre, icono, mensaje } = body;
 
+      // Incrementar contadores
       if (action === 'like' || action === 'visita') {
         await client.query(
           'UPDATE contadores SET cantidad = cantidad + 1, actualizado_en = NOW() WHERE tipo = $1',
@@ -83,12 +84,24 @@ exports.handler = async (event) => {
           })
         };
       }
+
+      // Crear comentario
+      if (dispositivo_id && nombre && icono && mensaje) {
+        await client.query(
+          'INSERT INTO comentarios (dispositivo_id, nombre, icono, mensaje, aprobado) VALUES ($1, $2, $3, $4, false)',
+          [dispositivo_id, nombre, icono, mensaje]
+        );
+
+        return {
+          statusCode: 201,
+          headers,
+          body: JSON.stringify({ message: 'Comentario enviado para aprobación' })
+        };
+      }
     }
 
-    // ============ COMENTARIOS ============
-
-    // GET /comentarios - obtener comentarios aprobados
-    if (method === 'GET' && path === '/.netlify/functions/comentarios') {
+    // GET comentarios aprobados
+    if (method === 'GET') {
       const result = await client.query(
         'SELECT id, nombre, icono, mensaje, creado_en FROM comentarios WHERE aprobado = true ORDER BY creado_en DESC'
       );
@@ -100,44 +113,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // POST /comentarios - crear comentario
-    if (method === 'POST' && path === '/.netlify/functions/comentarios') {
-      const body = JSON.parse(event.body);
-      const { dispositivo_id, nombre, icono, mensaje } = body;
-
-      // Validar que el dispositivo haya dado like
-      const likesCheck = await client.query(
-        'SELECT COUNT(*) FROM contadores WHERE tipo = $1',
-        ['likes']
-      );
-
-      // Obtener todos los dispositivos que han dado like (simulado por ahora)
-      // En la práctica, deberías tener una tabla de likes_registry
-
-      if (!dispositivo_id || !nombre || !icono || !mensaje) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Faltan campos requeridos' })
-        };
-      }
-
-      await client.query(
-        'INSERT INTO comentarios (dispositivo_id, nombre, icono, mensaje, aprobado) VALUES ($1, $2, $3, $4, false)',
-        [dispositivo_id, nombre, icono, mensaje]
-      );
-
-      return {
-        statusCode: 201,
-        headers,
-        body: JSON.stringify({ message: 'Comentario enviado para aprobación' })
-      };
-    }
-
     return {
-      statusCode: 404,
+      statusCode: 400,
       headers,
-      body: JSON.stringify({ error: 'Ruta no encontrada' })
+      body: JSON.stringify({ error: 'Acción no válida' })
     };
   } catch (error) {
     console.error('Error:', error);

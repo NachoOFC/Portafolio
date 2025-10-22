@@ -86,9 +86,9 @@
           >
             <div class="flex items-start gap-3">
               <!-- Avatar del icono -->
-              <div class="flex-shrink-0">
+            <div class="flex-shrink-0">
                 <img
-                  v-if="comentario.icono.includes('.svg')"
+                  v-if="comentario.icono && comentario.icono.includes('.svg')"
                   :src="`/iconos/${comentario.icono}`"
                   :alt="comentario.nombre"
                   class="w-10 h-10 rounded-full bg-gray-700 p-2"
@@ -221,11 +221,14 @@ export default {
       return fecha_obj.toLocaleDateString('es-ES');
     },
     getIcon(icono) {
+      if (!icono) return 'user';
+      
       const iconMap = {
         'man': 'user',
         'woman': 'user-female',
         'cool': 'face-grin-stars'
       };
+      
       return iconMap[icono] || 'user';
     }
   }
