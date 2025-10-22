@@ -108,7 +108,7 @@
                     Aprobado
                   </span>
                 </div>
-                <p class="text-gray-300 text-sm">{{ comentario.mensaje }}</p>
+                <p class="text-gray-300 text-sm break-words">{{ comentario.mensaje }}</p>
               </div>
 
               <!-- Botones si es comentario propio PENDIENTE (no aprobado) -->
@@ -176,6 +176,18 @@ export default {
 
     // Cargar comentarios
     this.cargarComentarios();
+
+    // Poll cada 10 segundos para actualizar comentarios (detectar aprobaciones)
+    setInterval(() => {
+      this.cargarComentarios();
+    }, 10000);
+
+    // Escuchar evento cuando se da like (desde ContadorVisitas)
+    window.addEventListener('likeGiven', () => {
+      setTimeout(() => {
+        this.verificarSiPuedeComentar();
+      }, 500);
+    });
   },
   methods: {
     verificarSiPuedeComentar() {
@@ -325,12 +337,9 @@ export default {
       })
         .then(res => res.json())
         .then(data => {
-          // Actualizar comentario en la lista
-          const index = this.comentarios.findIndex(c => c.id === id);
-          if (index !== -1) {
-            this.comentarios[index].mensaje = nuevoMensaje;
-          }
           alert('✅ Comentario actualizado');
+          // Recargar comentarios sin recargar página
+          this.cargarComentarios();
         })
         .catch(err => {
           console.error('Error:', err);
