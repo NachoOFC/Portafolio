@@ -78,7 +78,7 @@ export default {
     // SEGUNDO: Verificar si ya dio like (necesita deviceId)
     this.verificarSiYaLike();
 
-    // TERCERO: Obtener contadores globales del servidor al cargar
+    // TERCERO: Obtener contadores globales
     this.obtenerContadoresDelServidor();
 
     // Incrementar visitas solo una vez por sesión
@@ -137,29 +137,41 @@ export default {
     },
     verificarSiYaLike() {
       const likesRegistrados = localStorage.getItem('portafolioLikes') || '[]';
-      const dispositivos = JSON.parse(likesRegistrados);
+      let dispositivos = [];
+      
+      try {
+        dispositivos = JSON.parse(likesRegistrados);
+      } catch {
+        dispositivos = [];
+      }
+      
+      // Si el array no es un array válido, resetear
+      if (!Array.isArray(dispositivos)) {
+        dispositivos = [];
+        localStorage.setItem('portafolioLikes', JSON.stringify(dispositivos));
+      }
       
       // Recuperar timestamp del último like
       const ultimoLikeGuardado = localStorage.getItem('portafolioUltimoLike');
       this.ultimoLike = ultimoLikeGuardado ? new Date(ultimoLikeGuardado) : null;
       
-      // Si el dispositivo ya dio like hace menos de 12 horas, bloquear
-      if (dispositivos.includes(this.deviceId)) {
-        if (this.ultimoLike) {
-          const ahora = new Date();
-          const diferenciaMs = ahora - this.ultimoLike;
-          const diferencia12h = 12 * 60 * 60 * 1000; // 12 horas en ms
-          
-          if (diferenciaMs < diferencia12h) {
-            this.yaLike = true; // Bloqueado todavía
-            return;
-          }
+      // Si el dispositivo ya dio like
+      const yaEnLista = dispositivos.includes(this.deviceId);
+      
+      if (yaEnLista && this.ultimoLike) {
+        const ahora = new Date();
+        const diferenciaMs = ahora - this.ultimoLike;
+        const diferencia12h = 12 * 60 * 60 * 1000; // 12 horas en ms
+        
+        // Si pasaron menos de 12 horas, bloquear
+        if (diferenciaMs < diferencia12h) {
+          this.yaLike = true;
+          return;
         }
-        // Si pasaron más de 12 horas, permitir nuevo like
-        this.yaLike = false;
-      } else {
-        this.yaLike = false;
       }
+      
+      // Por defecto, permitir
+      this.yaLike = false;
     },
     agregarLike() {
       // Si ya dio like hace menos de 12 horas, no permitir
@@ -219,67 +231,37 @@ export default {
       return num;
     },
     enviarLikeAlServidor() {
-      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
-      
       const datos = {
         portafolioLikes: this.likes,
         portafolioVisitas: this.visitas,
         ultimaActualizacion: new Date().toISOString()
       };
 
-      fetch(urlBin, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
-        },
-        body: JSON.stringify(datos)
-      }).catch(() => {}); // Silenciar errores
+      // Usar localStorage como "servidor" local primero
+      localStorage.setItem('portafolioContadores', JSON.stringify(datos));
     },
     enviarVisitaAlServidor() {
-      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
-      
       const datos = {
         portafolioLikes: this.likes,
         portafolioVisitas: this.visitas,
         ultimaActualizacion: new Date().toISOString()
       };
 
-      fetch(urlBin, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
-        },
-        body: JSON.stringify(datos)
-      }).catch(() => {}); // Silenciar errores
+      // Usar localStorage como "servidor" local
+      localStorage.setItem('portafolioContadores', JSON.stringify(datos));
     },
     obtenerContadoresDelServidor() {
-      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
-      
-      fetch(urlBin, {
-        headers: {
-          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
+      // Obtener contadores del localStorage (compartido entre pestañas)
+      const datosGuardados = localStorage.getItem('portafolioContadores');
+      if (datosGuardados) {
+        const datos = JSON.parse(datosGuardados);
+        if (datos.portafolioVisitas && datos.portafolioVisitas > this.visitas) {
+          this.visitas = datos.portafolioVisitas;
         }
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Error');
-        return res.json();
-      })
-      .then(data => {
-        // JSONBin devuelve record directamente
-        if (data.record) {
-          // Actualizar visitas globales
-          if (data.record.portafolioVisitas && data.record.portafolioVisitas > this.visitas) {
-            this.visitas = data.record.portafolioVisitas;
-          }
-          // Actualizar likes globales
-          if (data.record.portafolioLikes && data.record.portafolioLikes > this.likes) {
-            this.likes = data.record.portafolioLikes;
-          }
+        if (datos.portafolioLikes && datos.portafolioLikes > this.likes) {
+          this.likes = datos.portafolioLikes;
         }
-      })
-      .catch(() => {}); // Silenciar errores
+      }
     },
     obtenerLikesDelServidor() {
       // Este método ahora se llama a través de obtenerContadoresDelServidor
