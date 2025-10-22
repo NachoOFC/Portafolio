@@ -86,11 +86,11 @@
             v-for="comentario in comentarios"
             :key="comentario.id"
             class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition relative"
-            :class="{ 'ring-2 ring-yellow-500': comentario.likes === obtenerMaximoLikes() && obtenerMaximoLikes() > 0 }"
+            :class="obtenerColorMedalla(obtenerPosicion(comentario.id))"
           >
-            <!-- Estrella dorada si es el más likeado -->
-            <div v-if="comentario.likes === obtenerMaximoLikes() && obtenerMaximoLikes() > 0" class="absolute -top-3 -right-3 bg-yellow-500 rounded-full p-2 shadow-lg">
-              <span class="text-lg">⭐</span>
+            <!-- Medalla si está en top 3 -->
+            <div v-if="obtenerMedalla(obtenerPosicion(comentario.id))" class="absolute -top-4 -right-4 text-4xl">
+              {{ obtenerMedalla(obtenerPosicion(comentario.id)) }}
             </div>
 
             <div class="flex gap-3">
@@ -363,9 +363,36 @@ export default {
       if (!texto) return 0;
       return texto.trim().split(/\s+/).filter(word => word.length > 0).length;
     },
-    obtenerMaximoLikes() {
-      if (this.comentarios.length === 0) return 0;
-      return Math.max(...this.comentarios.map(c => c.likes || 0));
+    obtenerRanking() {
+      // Retorna array con los 3 primeros por likes, ordenados descendente
+      const ordenados = [...this.comentarios].sort((a, b) => {
+        if (b.likes !== a.likes) {
+          return b.likes - a.likes;
+        }
+        return new Date(b.creado_en) - new Date(a.creado_en);
+      });
+      return ordenados.slice(0, 3);
+    },
+    obtenerPosicion(comentarioId) {
+      const ranking = this.obtenerRanking();
+      const posicion = ranking.findIndex(c => c.id === comentarioId);
+      return posicion >= 0 ? posicion + 1 : null;
+    },
+    obtenerMedalla(posicion) {
+      const medallas = {
+        1: '🥇',
+        2: '🥈',
+        3: '🥉'
+      };
+      return medallas[posicion] || null;
+    },
+    obtenerColorMedalla(posicion) {
+      const colores = {
+        1: 'ring-2 ring-yellow-500',
+        2: 'ring-2 ring-gray-400',
+        3: 'ring-2 ring-orange-600'
+      };
+      return colores[posicion] || '';
     },
     toggleLikeComentario(id) {
       const yaLike = this.misLikes[id];
