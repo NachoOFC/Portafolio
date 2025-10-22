@@ -78,16 +78,8 @@ export default {
     // SEGUNDO: Verificar si ya dio like (necesita deviceId)
     this.verificarSiYaLike();
 
-    // Cargar datos del localStorage
-    const datosGuardados = localStorage.getItem('portafolioStats');
-    if (datosGuardados) {
-      const datos = JSON.parse(datosGuardados);
-      this.visitas = datos.visitas || 1;
-      this.likes = datos.likes || 0;
-    }
-
-    // Obtener likes globales del servidor al cargar
-    this.obtenerLikesDelServidor();
+    // TERCERO: Obtener contadores globales del servidor al cargar
+    this.obtenerContadoresDelServidor();
 
     // Incrementar visitas solo una vez por sesión
     const visitaRegistrada = sessionStorage.getItem('visitaRegistrada');
@@ -95,6 +87,9 @@ export default {
       this.visitas += 1;
       sessionStorage.setItem('visitaRegistrada', 'true');
       this.guardarDatos();
+      
+      // Enviar nueva visita al servidor
+      this.enviarVisitaAlServidor();
     }
 
     // Escuchar cambios en localStorage desde otros dispositivos/pestañas
@@ -228,6 +223,7 @@ export default {
       
       const datos = {
         portafolioLikes: this.likes,
+        portafolioVisitas: this.visitas,
         ultimaActualizacion: new Date().toISOString()
       };
 
@@ -240,8 +236,26 @@ export default {
         body: JSON.stringify(datos)
       }).catch(() => {}); // Silenciar errores
     },
-    obtenerLikesDelServidor() {
-      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e/latest';
+    enviarVisitaAlServidor() {
+      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
+      
+      const datos = {
+        portafolioLikes: this.likes,
+        portafolioVisitas: this.visitas,
+        ultimaActualizacion: new Date().toISOString()
+      };
+
+      fetch(urlBin, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
+        },
+        body: JSON.stringify(datos)
+      }).catch(() => {}); // Silenciar errores
+    },
+    obtenerContadoresDelServidor() {
+      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
       
       fetch(urlBin, {
         headers: {
@@ -253,11 +267,23 @@ export default {
         return res.json();
       })
       .then(data => {
-        if (data.record && data.record.portafolioLikes > this.likes) {
-          this.likes = data.record.portafolioLikes;
+        // JSONBin devuelve record directamente
+        if (data.record) {
+          // Actualizar visitas globales
+          if (data.record.portafolioVisitas && data.record.portafolioVisitas > this.visitas) {
+            this.visitas = data.record.portafolioVisitas;
+          }
+          // Actualizar likes globales
+          if (data.record.portafolioLikes && data.record.portafolioLikes > this.likes) {
+            this.likes = data.record.portafolioLikes;
+          }
         }
       })
       .catch(() => {}); // Silenciar errores
+    },
+    obtenerLikesDelServidor() {
+      // Este método ahora se llama a través de obtenerContadoresDelServidor
+      this.obtenerContadoresDelServidor();
     }
   }
 }

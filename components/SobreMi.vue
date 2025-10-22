@@ -171,10 +171,14 @@ export default {
 .typing-text {
   display: inline-block;
   text-align: left;
+  min-width: 320px;
+  letter-spacing: -0.02em;
 }
 .typing-text-secondary {
   display: inline-block;
   text-align: left;
+  min-width: 230px;
+  letter-spacing: -0.02em;
 }
 .cursor {
   animation: blink 1s infinite;
