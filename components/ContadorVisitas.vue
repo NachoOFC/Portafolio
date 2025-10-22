@@ -82,6 +82,9 @@ export default {
       this.likes = datos.likes || 0;
     }
 
+    // Obtener likes globales del servidor
+    this.obtenerLikesDelServidor();
+
     // Verificar si ya dio like
     this.verificarSiYaLike();
 
@@ -93,6 +96,14 @@ export default {
       this.guardarDatos();
     }
 
+    // Escuchar cambios en localStorage desde otros dispositivos/pestañas
+    window.addEventListener('storage', this.actualizarDatos);
+
+    // Sincronizar likes cada 5 segundos
+    setInterval(() => {
+      this.obtenerLikesDelServidor();
+    }, 5000);
+
     // Google Analytics: registrar vista de página
     if (window.gtag) {
       window.gtag('event', 'page_view', {
@@ -101,7 +112,17 @@ export default {
       });
     }
   },
+  beforeUnmount() {
+    window.removeEventListener('storage', this.actualizarDatos);
+  },
   methods: {
+    actualizarDatos() {
+      const datosGuardados = localStorage.getItem('portafolioStats');
+      if (datosGuardados) {
+        const datos = JSON.parse(datosGuardados);
+        this.likes = datos.likes || 0;
+      }
+    },
     obtenerDeviceId() {
       // Intentar obtener ID guardado
       let deviceId = localStorage.getItem('portafolioDeviceId');
@@ -145,6 +166,9 @@ export default {
       localStorage.setItem('portafolioLikes', JSON.stringify(dispositivos));
 
       this.guardarDatos();
+      
+      // Enviar like a API pública para sincronizar
+      this.enviarLikeAlServidor();
 
       // Animación
       setTimeout(() => {
@@ -157,6 +181,44 @@ export default {
           total_likes: this.likes
         });
       }
+    },
+    enviarLikeAlServidor() {
+      // Usar JSONBin.io API gratuita para guardar likes globales
+      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
+      
+      const datos = {
+        portafolioLikes: this.likes,
+        ultimaActualizacion: new Date().toISOString()
+      };
+
+      fetch(urlBin, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote' // Clave pública (no es sensible)
+        },
+        body: JSON.stringify(datos)
+      }).catch(err => console.log('No se pudo sincronizar likes:', err));
+    },
+    obtenerLikesDelServidor() {
+      // Obtener likes globales de JSONBin
+      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e/latest';
+      
+      fetch(urlBin, {
+        headers: {
+          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.record && data.record.portafolioLikes) {
+          // Actualizar solo si el servidor tiene más likes
+          if (data.record.portafolioLikes > this.likes) {
+            this.likes = data.record.portafolioLikes;
+          }
+        }
+      })
+      .catch(err => console.log('No se pudieron obtener likes:', err));
     },
     guardarDatos() {
       const datos = {
