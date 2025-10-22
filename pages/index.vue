@@ -101,6 +101,7 @@
       </div>
     </div>
   </section>
+  <Comentarios />
 </template>
 
 <script>
@@ -108,6 +109,7 @@ import SobreMi from '@/components/SobreMi.vue'
 import Proyectos from '@/pages/proyectos.vue'
 import Trayectoria from '@/components/Trayectoria.vue'
 import Estadisticas from '@/components/Estadisticas.vue'
+import Comentarios from '@/components/Comentarios.vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -116,7 +118,7 @@ import 'swiper/css/pagination';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 export default {
-  components: { SobreMi, Proyectos, Trayectoria, Estadisticas, Swiper, SwiperSlide },
+  components: { SobreMi, Proyectos, Trayectoria, Estadisticas, Comentarios, Swiper, SwiperSlide },
   data() {
     return {
       modules: [Navigation, Pagination],
