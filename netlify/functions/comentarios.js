@@ -127,10 +127,10 @@ exports.handler = async (event) => {
         };
       }
 
-      // Verificar si ya comentó en las últimas 24 horas
+      // Verificar si ya comentó en las últimas 24 horas (solo comentarios APROBADOS cuentan)
       const hace24hrs = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const ultimoComentario = await client.query(
-        'SELECT creado_en FROM comentarios WHERE dispositivo_id = $1 AND creado_en > $2 ORDER BY creado_en DESC LIMIT 1',
+        'SELECT creado_en FROM comentarios WHERE dispositivo_id = $1 AND aprobado = true AND creado_en > $2 ORDER BY creado_en DESC LIMIT 1',
         [dispositivo_id, hace24hrs]
       );
 
