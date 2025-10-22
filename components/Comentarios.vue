@@ -111,6 +111,21 @@
                   </span>
                 </div>
                 <p class="text-gray-300 text-sm break-words leading-relaxed">{{ comentario.mensaje }}</p>
+                
+                <!-- Botón de like -->
+                <div class="mt-2 flex items-center gap-2">
+                  <button
+                    @click="toggleLikeComentario(comentario.id)"
+                    :class="[
+                      'text-xs px-3 py-1 rounded transition',
+                      misLikes[comentario.id]
+                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                        : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                    ]"
+                  >
+                    {{ misLikes[comentario.id] ? '❤️' : '🤍' }} {{ comentario.likes || 0 }}
+                  </button>
+                </div>
               </div>
 
               <!-- Botones si es comentario propio PENDIENTE (no aprobado) -->
@@ -163,7 +178,8 @@ export default {
       ],
       proximoComentarioEn: null,
       editando: null,
-      misComentarios: {} // { id: true/false }
+      misComentarios: {}, // { id: true/false }
+      misLikes: {} // { comentario_id: true/false }
     };
   },
   mounted() {
@@ -175,6 +191,9 @@ export default {
 
     // Cargar comentarios propios del localStorage
     this.cargarMisComentarios();
+
+    // Cargar mis likes del localStorage
+    this.cargarMisLikes();
 
     // Cargar comentarios
     this.cargarComentarios();
@@ -221,6 +240,15 @@ export default {
     guardarMisComentarios() {
       const misComentariosKey = `portafolioMisComentarios_${this.dispositivo_id}`;
       localStorage.setItem(misComentariosKey, JSON.stringify(this.misComentarios));
+    },
+    cargarMisLikes() {
+      const misLikesKey = `portafolioMisLikes_${this.dispositivo_id}`;
+      const stored = localStorage.getItem(misLikesKey);
+      this.misLikes = stored ? JSON.parse(stored) : {};
+    },
+    guardarMisLikes() {
+      const misLikesKey = `portafolioMisLikes_${this.dispositivo_id}`;
+      localStorage.setItem(misLikesKey, JSON.stringify(this.misLikes));
     },
     cargarComentarios() {
       // Pasar dispositivo_id para que el backend retorne comentarios aprobados + pendientes del usuario
@@ -320,6 +348,89 @@ export default {
     contarPalabras(texto) {
       if (!texto) return 0;
       return texto.trim().split(/\s+/).filter(word => word.length > 0).length;
+    },
+    toggleLikeComentario(id) {
+      const yaLike = this.misLikes[id];
+      
+      if (yaLike) {
+        this.quitarLikeComentario(id);
+      } else {
+        this.darLikeComentario(id);
+      }
+    },
+    darLikeComentario(id) {
+      fetch('/.netlify/functions/comentarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'like',
+          comentario_id: id,
+          dispositivo_id: this.dispositivo_id
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Actualizar estado local
+          this.misLikes[id] = true;
+          this.guardarMisLikes();
+          
+          // Actualizar contador en comentario
+          const comentario = this.comentarios.find(c => c.id === id);
+          if (comentario) {
+            comentario.likes = data.likes;
+          }
+          
+          // Reordenar comentarios por likes
+          this.comentarios.sort((a, b) => {
+            if (b.likes !== a.likes) {
+              return b.likes - a.likes;
+            }
+            return new Date(b.creado_en) - new Date(a.creado_en);
+          });
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Error al dar like');
+        });
+    },
+    quitarLikeComentario(id) {
+      fetch('/.netlify/functions/comentarios', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'unlike',
+          id: id,
+          dispositivo_id: this.dispositivo_id
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Actualizar estado local
+          delete this.misLikes[id];
+          this.guardarMisLikes();
+          
+          // Actualizar contador en comentario
+          const comentario = this.comentarios.find(c => c.id === id);
+          if (comentario) {
+            comentario.likes = data.likes;
+          }
+          
+          // Reordenar comentarios por likes
+          this.comentarios.sort((a, b) => {
+            if (b.likes !== a.likes) {
+              return b.likes - a.likes;
+            }
+            return new Date(b.creado_en) - new Date(a.creado_en);
+          });
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Error al quitar like');
+        });
     },
     editarComentario(id) {
       const comentario = this.comentarios.find(c => c.id === id);

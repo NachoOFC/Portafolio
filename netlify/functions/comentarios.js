@@ -35,7 +35,7 @@ exports.handler = async (event) => {
       const dispositivo_id = event.queryStringParameters?.dispositivo_id;
       
       // Si viene con dispositivo_id, retorna aprobados + sus pendientes
-      let query = 'SELECT id, nombre, icono, mensaje, creado_en, aprobado, dispositivo_id FROM comentarios WHERE aprobado = true';
+      let query = 'SELECT id, nombre, icono, mensaje, creado_en, aprobado, dispositivo_id, likes FROM comentarios WHERE aprobado = true';
       let params = [];
       
       if (dispositivo_id) {
@@ -43,7 +43,7 @@ exports.handler = async (event) => {
         params = [dispositivo_id];
       }
       
-      query += ' ORDER BY creado_en DESC';
+      query += ' ORDER BY likes DESC, creado_en DESC';
       
       const result = await client.query(query, params);
 
@@ -54,11 +54,56 @@ exports.handler = async (event) => {
       };
     }
 
-    // POST - crear comentario (aprobado = false por defecto)
+    // POST - crear comentario O dar like a comentario
     if (method === 'POST') {
       const body = JSON.parse(event.body);
-      const { dispositivo_id, nombre, icono, mensaje } = body;
+      const { dispositivo_id, nombre, icono, mensaje, comentario_id, action } = body;
 
+      // ACCIÓN: DAR LIKE A UN COMENTARIO
+      if (action === 'like' && comentario_id && dispositivo_id) {
+        // Verificar si ya dio like
+        const yaLike = await client.query(
+          'SELECT id FROM comentarios_likes WHERE comentario_id = $1 AND dispositivo_id = $2',
+          [comentario_id, dispositivo_id]
+        );
+
+        if (yaLike.rows.length > 0) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Ya diste like a este comentario' })
+          };
+        }
+
+        // Insertar like
+        await client.query(
+          'INSERT INTO comentarios_likes (comentario_id, dispositivo_id) VALUES ($1, $2)',
+          [comentario_id, dispositivo_id]
+        );
+
+        // Incrementar contador de likes en comentarios
+        await client.query(
+          'UPDATE comentarios SET likes = likes + 1 WHERE id = $1',
+          [comentario_id]
+        );
+
+        // Obtener nuevo contador
+        const resultado = await client.query(
+          'SELECT likes FROM comentarios WHERE id = $1',
+          [comentario_id]
+        );
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ 
+            message: 'Like agregado',
+            likes: resultado.rows[0].likes
+          })
+        };
+      }
+
+      // ACCIÓN: CREAR COMENTARIO
       if (!dispositivo_id || !nombre || !icono || !mensaje) {
         return {
           statusCode: 400,
@@ -144,11 +189,56 @@ exports.handler = async (event) => {
       };
     }
 
-    // DELETE - borrar comentario propio (solo el dueño)
+    // DELETE - borrar comentario propio (solo el dueño) O quitar like
     if (method === 'DELETE') {
       const body = JSON.parse(event.body);
-      const { id, dispositivo_id } = body;
+      const { id, dispositivo_id, action } = body;
 
+      // ACCIÓN: QUITAR LIKE A UN COMENTARIO
+      if (action === 'unlike' && id && dispositivo_id) {
+        // Verificar si el usuario tiene like en este comentario
+        const likeExistente = await client.query(
+          'SELECT id FROM comentarios_likes WHERE comentario_id = $1 AND dispositivo_id = $2',
+          [id, dispositivo_id]
+        );
+
+        if (likeExistente.rows.length === 0) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'No has dado like a este comentario' })
+          };
+        }
+
+        // Eliminar like
+        await client.query(
+          'DELETE FROM comentarios_likes WHERE comentario_id = $1 AND dispositivo_id = $2',
+          [id, dispositivo_id]
+        );
+
+        // Decrementar contador de likes en comentarios
+        await client.query(
+          'UPDATE comentarios SET likes = GREATEST(likes - 1, 0) WHERE id = $1',
+          [id]
+        );
+
+        // Obtener nuevo contador
+        const resultado = await client.query(
+          'SELECT likes FROM comentarios WHERE id = $1',
+          [id]
+        );
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ 
+            message: 'Like removido',
+            likes: resultado.rows[0].likes
+          })
+        };
+      }
+
+      // ACCIÓN: ELIMINAR COMENTARIO PROPIO
       if (!id || !dispositivo_id) {
         return {
           statusCode: 400,
