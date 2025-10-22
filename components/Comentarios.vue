@@ -212,10 +212,10 @@ export default {
     // Cargar comentarios
     this.cargarComentarios();
 
-    // Poll cada 10 segundos para actualizar comentarios (detectar aprobaciones)
+    // Poll cada 3 segundos para actualizar comentarios en tiempo real
     setInterval(() => {
       this.cargarComentarios();
-    }, 10000);
+    }, 3000);
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
     window.addEventListener('likeGiven', () => {

@@ -98,6 +98,11 @@ export default {
       this.enviarVisitaAlServidor();
     }
 
+    // Poll cada 2 segundos para actualizar contadores en tiempo real
+    setInterval(() => {
+      this.obtenerContadoresDelServidor();
+    }, 2000);
+
     // Google Analytics: registrar vista de página
     if (window.gtag) {
       window.gtag('event', 'page_view', {
