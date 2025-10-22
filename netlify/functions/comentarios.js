@@ -47,10 +47,25 @@ exports.handler = async (event) => {
       
       const result = await client.query(query, params);
 
+      // Si vienen comentarios, agregar información de likes del usuario
+      let comentarios = result.rows;
+      if (dispositivo_id && comentarios.length > 0) {
+        const likesResult = await client.query(
+          'SELECT comentario_id FROM comentarios_likes WHERE dispositivo_id = $1',
+          [dispositivo_id]
+        );
+        const misLikes = new Set(likesResult.rows.map(r => r.comentario_id));
+        
+        comentarios = comentarios.map(c => ({
+          ...c,
+          yaLike: misLikes.has(c.id)
+        }));
+      }
+
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(result.rows)
+        body: JSON.stringify(comentarios)
       };
     }
 

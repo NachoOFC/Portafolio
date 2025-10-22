@@ -85,8 +85,14 @@
           <div
             v-for="comentario in comentarios"
             :key="comentario.id"
-            class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition"
+            class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition relative"
+            :class="{ 'ring-2 ring-yellow-500': comentario.likes === obtenerMaximoLikes() && obtenerMaximoLikes() > 0 }"
           >
+            <!-- Estrella dorada si es el más likeado -->
+            <div v-if="comentario.likes === obtenerMaximoLikes() && obtenerMaximoLikes() > 0" class="absolute -top-3 -right-3 bg-yellow-500 rounded-full p-2 shadow-lg">
+              <span class="text-lg">⭐</span>
+            </div>
+
             <div class="flex gap-3">
               <!-- Avatar del icono -->
               <div class="flex-shrink-0">
@@ -260,6 +266,14 @@ export default {
           // Filtrar para solo obtener comentarios válidos
           if (Array.isArray(data)) {
             this.comentarios = data.filter(c => c.id && c.nombre && c.mensaje && c.creado_en);
+            
+            // Sincronizar likes desde el backend
+            this.comentarios.forEach(comentario => {
+              if (comentario.yaLike) {
+                this.misLikes[comentario.id] = true;
+              }
+            });
+            this.guardarMisLikes();
           }
         })
         .catch(err => console.error('Error cargando comentarios:', err));
@@ -348,6 +362,10 @@ export default {
     contarPalabras(texto) {
       if (!texto) return 0;
       return texto.trim().split(/\s+/).filter(word => word.length > 0).length;
+    },
+    obtenerMaximoLikes() {
+      if (this.comentarios.length === 0) return 0;
+      return Math.max(...this.comentarios.map(c => c.likes || 0));
     },
     toggleLikeComentario(id) {
       const yaLike = this.misLikes[id];
