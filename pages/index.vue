@@ -81,9 +81,10 @@
         Fuimos ganadores del 2º lugar en la Hackatón TICSUR 2024 Temuco, Chile. Aquí puedes ver el desafío y algunas
         imágenes del evento.
       </p>
-      <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-6">
+      <div class="flex flex-col md:flex-row gap-6 justify-center items-center mb-6 flex-wrap">
         <img src="/Hackaton/ganadores.jpg" alt="Ganadores Hackatón" class="rounded-xl shadow-lg max-w-xs w-full cursor-pointer hover:scale-105 transition" @click="abrirHackatonModal('/Hackaton/ganadores.jpg', 'Ganadores Hackatón TICSUR 2024')" />
         <img src="/Hackaton/hackaton.jpg" alt="Hackatón TICSUR" class="rounded-xl shadow-lg max-w-xs w-full cursor-pointer hover:scale-105 transition" @click="abrirHackatonModal('/Hackaton/hackaton.jpg', 'Hackatón TICSUR 2024')" />
+        <img src="/Hackaton/grupo.png" alt="Grupo Hackatón" class="rounded-xl shadow-lg max-w-xs w-full cursor-pointer hover:scale-105 transition" @click="abrirHackatonModal('/Hackaton/grupo.png', 'Equipo Hackatón TICSUR 2024')" />
       </div>
       <div class="flex justify-center">
         <a href="/Hackaton/Desafio TICSur 2024.pdf" target="_blank" rel="noopener"
