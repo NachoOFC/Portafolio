@@ -1,17 +1,15 @@
-// Almacenamiento en memoria (se reinicia con cada deploy)
-// TODO: Migrar a una DB real en el futuro
-let contadores = {
-  likes: 0,
-  visitas: 0,
-  ultimaActualizacion: new Date().toISOString()
-};
+// Usar pg para conectar a Neon (PostgreSQL)
+const { Client } = require('pg');
 
-// En producción usarías una DB real
-// Por ahora, esto se reinicia cada vez que Netlify redeploya la función
+const getDatabaseClient = () => {
+  return new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+};
 
 exports.handler = async (event) => {
   const method = event.httpMethod;
-  const path = event.path;
 
   // CORS headers
   const headers = {
@@ -26,67 +24,80 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers };
   }
 
+  let client;
+
   try {
-    // GET /contadores - obtener contadores
-    if (method === 'GET' && path === '/.netlify/functions/contadores') {
+    client = getDatabaseClient();
+    await client.connect();
+
+    // GET - obtener contadores
+    if (method === 'GET') {
+      const result = await client.query(
+        'SELECT tipo, cantidad FROM contadores ORDER BY tipo'
+      );
+
+      const contadores = {};
+      result.rows.forEach(row => {
+        contadores[row.tipo] = row.cantidad;
+      });
+
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(contadores)
+        body: JSON.stringify({
+          likes: contadores.likes || 0,
+          visitas: contadores.visitas || 0
+        })
       };
     }
 
-    // POST /contadores - agregar like
-    if (method === 'POST' && path === '/.netlify/functions/contadores') {
+    // POST - incrementar contadores
+    if (method === 'POST') {
       const body = JSON.parse(event.body);
-      
-      if (body.action === 'like') {
-        contadores.likes += 1;
-        contadores.ultimaActualizacion = new Date().toISOString();
-      }
-      
-      if (body.action === 'visita') {
-        contadores.visitas += 1;
-        contadores.ultimaActualizacion = new Date().toISOString();
-      }
+      const { action } = body; // action: 'like' o 'visita'
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(contadores)
-      };
-    }
+      if (action === 'like' || action === 'visita') {
+        await client.query(
+          'UPDATE contadores SET cantidad = cantidad + 1, actualizado_en = NOW() WHERE tipo = $1',
+          [action === 'like' ? 'likes' : 'visitas']
+        );
 
-    // PUT /contadores - actualizar contadores (si alguien quiere resetear)
-    if (method === 'PUT' && path === '/.netlify/functions/contadores') {
-      const body = JSON.parse(event.body);
-      
-      if (body.likes !== undefined) {
-        contadores.likes = body.likes;
-      }
-      if (body.visitas !== undefined) {
-        contadores.visitas = body.visitas;
-      }
-      
-      contadores.ultimaActualizacion = new Date().toISOString();
+        // Obtener nuevos valores
+        const result = await client.query(
+          'SELECT tipo, cantidad FROM contadores ORDER BY tipo'
+        );
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(contadores)
-      };
+        const contadores = {};
+        result.rows.forEach(row => {
+          contadores[row.tipo] = row.cantidad;
+        });
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            likes: contadores.likes || 0,
+            visitas: contadores.visitas || 0
+          })
+        };
+      }
     }
 
     return {
-      statusCode: 404,
+      statusCode: 400,
       headers,
-      body: JSON.stringify({ error: 'Ruta no encontrada' })
+      body: JSON.stringify({ error: 'Acción no válida' })
     };
   } catch (error) {
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ error: error.message })
     };
+  } finally {
+    if (client) {
+      await client.end();
+    }
   }
 };
