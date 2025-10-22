@@ -100,12 +100,19 @@
                 <div class="flex items-center gap-2 mb-1">
                   <p class="font-semibold">{{ comentario.nombre }}</p>
                   <span class="text-xs text-gray-400">{{ formatearFecha(comentario.creado_en) }}</span>
+                  <!-- Badge de estado -->
+                  <span v-if="comentario.aprobado === false" class="text-xs px-2 py-0.5 bg-yellow-900 text-yellow-200 rounded">
+                    Pendiente
+                  </span>
+                  <span v-else class="text-xs px-2 py-0.5 bg-green-900 text-green-200 rounded">
+                    Aprobado
+                  </span>
                 </div>
                 <p class="text-gray-300 text-sm">{{ comentario.mensaje }}</p>
               </div>
 
-              <!-- Botones si es comentario propio -->
-              <div v-if="misComentarios[comentario.id]" class="flex gap-2 flex-shrink-0">
+              <!-- Botones si es comentario propio PENDIENTE (no aprobado) -->
+              <div v-if="misComentarios[comentario.id] && comentario.aprobado === false" class="flex gap-2 flex-shrink-0">
                 <button
                   @click="editarComentario(comentario.id)"
                   :disabled="enviando"
@@ -202,7 +209,10 @@ export default {
       localStorage.setItem(misComentariosKey, JSON.stringify(this.misComentarios));
     },
     cargarComentarios() {
-      fetch('/.netlify/functions/comentarios')
+      // Pasar dispositivo_id para que el backend retorne comentarios aprobados + pendientes del usuario
+      const url = `/.netlify/functions/comentarios?dispositivo_id=${this.dispositivo_id}`;
+      
+      fetch(url)
         .then(res => res.json())
         .then(data => {
           // Filtrar para solo obtener comentarios válidos

@@ -30,11 +30,22 @@ exports.handler = async (event) => {
     client = getDatabaseClient();
     await client.connect();
 
-    // GET - obtener comentarios aprobados
+    // GET - obtener comentarios aprobados + pendientes del usuario
     if (method === 'GET') {
-      const result = await client.query(
-        'SELECT id, nombre, icono, mensaje, creado_en FROM comentarios WHERE aprobado = true ORDER BY creado_en DESC'
-      );
+      const dispositivo_id = event.queryStringParameters?.dispositivo_id;
+      
+      // Si viene con dispositivo_id, retorna aprobados + sus pendientes
+      let query = 'SELECT id, nombre, icono, mensaje, creado_en, aprobado, dispositivo_id FROM comentarios WHERE aprobado = true';
+      let params = [];
+      
+      if (dispositivo_id) {
+        query += ' OR dispositivo_id = $1';
+        params = [dispositivo_id];
+      }
+      
+      query += ' ORDER BY creado_en DESC';
+      
+      const result = await client.query(query, params);
 
       return {
         statusCode: 200,
