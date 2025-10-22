@@ -24,26 +24,24 @@
           <!-- Selector de icono -->
           <div class="mb-4">
             <p class="text-sm text-gray-300 mb-2">Elige tu icono:</p>
-            <div class="flex flex-wrap gap-3">
+            <div class="flex flex-wrap gap-2">
               <button
                 v-for="ico in iconos"
                 :key="ico"
                 @click="nuevoComentario.icono = ico"
                 :class="[
-                  'px-3 py-2 rounded border-2 transition',
+                  'p-2 rounded border-2 transition',
                   nuevoComentario.icono === ico
                     ? 'border-blue-500 bg-blue-500/20'
                     : 'border-gray-600 hover:border-gray-500'
                 ]"
+                :title="ico.replace('.png', '')"
               >
                 <img
-                  v-if="ico.includes('.svg')"
-                  :src="`/iconos/${ico}`"
+                  :src="`/comentarios/${ico}`"
                   :alt="ico"
-                  class="w-5 h-5 inline mr-1"
+                  class="w-6 h-6"
                 />
-                <i v-else :class="`fas fa-${getIcon(ico)} text-sm`"></i>
-                <span class="text-xs">{{ ico }}</span>
               </button>
             </div>
           </div>
@@ -86,19 +84,13 @@
           >
             <div class="flex items-start gap-3">
               <!-- Avatar del icono -->
-            <div class="flex-shrink-0">
+              <div class="flex-shrink-0">
                 <img
-                  v-if="comentario.icono && comentario.icono.includes('.svg')"
-                  :src="`/iconos/${comentario.icono}`"
+                  :src="`/comentarios/${comentario.icono}`"
                   :alt="comentario.nombre"
-                  class="w-10 h-10 rounded-full bg-gray-700 p-2"
+                  class="w-10 h-10 rounded-full bg-gray-700 object-contain"
                 />
-                <div v-else class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                  <i :class="`fas fa-${getIcon(comentario.icono)} text-white text-sm`"></i>
-                </div>
-              </div>
-
-              <!-- Contenido -->
+              </div>              <!-- Contenido -->
               <div class="flex-grow">
                 <div class="flex items-center gap-2 mb-1">
                   <p class="font-semibold">{{ comentario.nombre }}</p>
@@ -128,13 +120,12 @@ export default {
       puedeComentar: false,
       dispositivo_id: null,
       iconos: [
-        'vue.svg',
-        'react_dark.svg',
-        'python.svg',
-        'javascript.svg',
-        'nuxt.svg',
-        'man',
-        'woman'
+        'programmer.png',
+        'people.png',
+        'woman.png',
+        'cat.png',
+        'dog.png',
+        'aliens.png'
       ]
     };
   },
@@ -155,10 +146,13 @@ export default {
       this.puedeComentar = !!ultimoLike; // True si existe el timestamp
     },
     cargarComentarios() {
-      fetch('/.netlify/functions/comentarios')
+      fetch('/.netlify/functions/contadores')
         .then(res => res.json())
         .then(data => {
-          this.comentarios = data;
+          // Filtrar para solo obtener comentarios válidos
+          if (Array.isArray(data)) {
+            this.comentarios = data.filter(c => c.id && c.nombre && c.mensaje && c.creado_en);
+          }
         })
         .catch(err => console.error('Error cargando comentarios:', err));
     },
@@ -206,7 +200,11 @@ export default {
         });
     },
     formatearFecha(fecha) {
+      if (!fecha) return 'hace poco';
+      
       const fecha_obj = new Date(fecha);
+      if (isNaN(fecha_obj.getTime())) return 'hace poco';
+      
       const ahora = new Date();
       const diferencia = ahora - fecha_obj;
       const minutos = Math.floor(diferencia / 1000 / 60);
@@ -219,17 +217,6 @@ export default {
       if (dias < 7) return `${dias}d`;
 
       return fecha_obj.toLocaleDateString('es-ES');
-    },
-    getIcon(icono) {
-      if (!icono) return 'user';
-      
-      const iconMap = {
-        'man': 'user',
-        'woman': 'user-female',
-        'cool': 'face-grin-stars'
-      };
-      
-      return iconMap[icono] || 'user';
     }
   }
 };
