@@ -1,6 +1,6 @@
 <template>
   <section class="min-h-screen flex items-center justify-center py-12 bg-gray-900 text-white">
-    <div class="max-w-4xl w-full mx-auto px-4 flex flex-col items-center">
+    <div class="max-w-4xl w-full mx-auto px-4 flex flex-col items-center justify-center">
       <img src="/yo.jpg" alt="Ignacio" class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg mb-4" />
       <div class="flex flex-row items-center justify-center gap-4 mb-4">
         <a href="https://github.com/NachoOFC" target="_blank" rel="noopener" class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
@@ -12,16 +12,16 @@
           <span class="text-green-400 font-semibold text-xs tracking-wide">DISPONIBLE</span>
         </div>
       </div>
-      <h1 class="text-3xl font-bold mb-1 text-center">
+      <h1 class="text-3xl font-bold mb-1 text-center w-full px-4">
         <span class="text-gradient">¡Hola! Soy </span>
         <span class="typing-text text-gradient">{{ displayText }}</span>
         <span v-if="isTyping" class="cursor text-gradient">|</span>
       </h1>
-      <h2 class="text-xl font-semibold mb-3 text-center">
+      <h2 class="text-xl font-semibold mb-3 text-center w-full px-4">
         <span class="typing-text-secondary text-gradient">{{ displayTextSecondary }}</span>
         <span v-if="isTypingSecondary" class="cursor-secondary text-gradient">|</span>
       </h2>
-      <p class="text-lg mb-0 text-gray-300 text-center">
+      <p class="text-lg mb-0 text-gray-300 text-center break-words w-full px-4 max-w-2xl">
         Desarrollador web y creador de experiencias digitales.<br>
         Soy Ignacio, desarrollador web apasionado por crear experiencias digitales atractivas y funcionales. Me especializo en Vue, Nuxt y tecnologías modernas de frontend.
       </p>
@@ -169,15 +169,13 @@ export default {
   background-clip: text;
 }
 .typing-text {
-  display: inline-block;
-  text-align: left;
-  min-width: 320px;
+  display: inline;
+  text-align: center;
   letter-spacing: -0.02em;
 }
 .typing-text-secondary {
-  display: inline-block;
-  text-align: left;
-  min-width: 230px;
+  display: inline;
+  text-align: center;
   letter-spacing: -0.02em;
 }
 .cursor {
