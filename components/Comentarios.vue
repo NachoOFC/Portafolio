@@ -113,7 +113,7 @@ export default {
       comentarios: [],
       nuevoComentario: {
         nombre: '',
-        icono: 'vue.svg',
+        icono: 'programmer.png',
         mensaje: ''
       },
       enviando: false,
@@ -146,7 +146,7 @@ export default {
       this.puedeComentar = !!ultimoLike; // True si existe el timestamp
     },
     cargarComentarios() {
-      fetch('/.netlify/functions/contadores')
+      fetch('/.netlify/functions/comentarios')
         .then(res => res.json())
         .then(data => {
           // Filtrar para solo obtener comentarios válidos
@@ -180,7 +180,7 @@ export default {
           // Resetear formulario
           this.nuevoComentario = {
             nombre: '',
-            icono: 'vue.svg',
+            icono: 'programmer.png',
             mensaje: ''
           };
           // Mostrar mensaje de éxito
