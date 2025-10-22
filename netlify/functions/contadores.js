@@ -1,4 +1,5 @@
-// Almacenamiento en memoria (se reinicia con cada deploy, pero es simple para empezar)
+// Almacenamiento en memoria (se reinicia con cada deploy)
+// TODO: Migrar a una DB real en el futuro
 let contadores = {
   likes: 0,
   visitas: 0,
