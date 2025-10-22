@@ -62,38 +62,31 @@
 export default {
   data() {
     return {
-      visitas: 1,
+      visitas: 0,
       likes: 0,
       mostrarVisitas: false,
       likeReciente: false,
       yaLike: false,
-      deviceId: null,
-      ultimoLike: null // timestamp del último like
+      deviceId: null
     }
   },
   mounted() {
-    // PRIMERO: Generar o recuperar ID único del dispositivo
+    // Obtener ID único del dispositivo
     this.obtenerDeviceId();
 
-    // SEGUNDO: Verificar si ya dio like (necesita deviceId)
+    // Verificar si ya dio like en esta sesión
     this.verificarSiYaLike();
 
-    // TERCERO: Obtener contadores globales
+    // Obtener contadores globales del servidor
     this.obtenerContadoresDelServidor();
 
     // Incrementar visitas solo una vez por sesión
     const visitaRegistrada = sessionStorage.getItem('visitaRegistrada');
     if (!visitaRegistrada) {
-      this.visitas += 1;
       sessionStorage.setItem('visitaRegistrada', 'true');
-      this.guardarDatos();
-      
       // Enviar nueva visita al servidor
       this.enviarVisitaAlServidor();
     }
-
-    // Escuchar cambios en localStorage desde otros dispositivos/pestañas
-    window.addEventListener('storage', this.actualizarDatos);
 
     // Google Analytics: registrar vista de página
     if (window.gtag) {
@@ -103,22 +96,12 @@ export default {
       });
     }
   },
-  beforeUnmount() {
-    window.removeEventListener('storage', this.actualizarDatos);
-  },
   methods: {
-    actualizarDatos() {
-      const datosGuardados = localStorage.getItem('portafolioStats');
-      if (datosGuardados) {
-        const datos = JSON.parse(datosGuardados);
-        this.likes = datos.likes || 0;
-      }
-    },
     obtenerDeviceId() {
       // Intentar obtener ID guardado
       let deviceId = localStorage.getItem('portafolioDeviceId');
       
-      // Si no existe, generar uno nuevo y guardarlo
+      // Si no existe, generar uno nuevo
       if (!deviceId) {
         deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         localStorage.setItem('portafolioDeviceId', deviceId);
@@ -126,57 +109,14 @@ export default {
       
       this.deviceId = deviceId;
     },
-    hashCode(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convertir a entero de 32 bits
-      }
-      return Math.abs(hash).toString(16);
-    },
     verificarSiYaLike() {
-      const likesRegistrados = localStorage.getItem('portafolioLikes') || '[]';
-      let dispositivos = [];
-      
-      try {
-        dispositivos = JSON.parse(likesRegistrados);
-      } catch {
-        dispositivos = [];
-      }
-      
-      // Si el array no es un array válido, resetear
-      if (!Array.isArray(dispositivos)) {
-        dispositivos = [];
-        localStorage.setItem('portafolioLikes', JSON.stringify(dispositivos));
-      }
-      
-      // Recuperar timestamp del último like
-      const ultimoLikeGuardado = localStorage.getItem('portafolioUltimoLike');
-      this.ultimoLike = ultimoLikeGuardado ? new Date(ultimoLikeGuardado) : null;
-      
-      // Si el dispositivo ya dio like
-      const yaEnLista = dispositivos.includes(this.deviceId);
-      
-      if (yaEnLista && this.ultimoLike) {
-        const ahora = new Date();
-        const diferenciaMs = ahora - this.ultimoLike;
-        const diferencia12h = 12 * 60 * 60 * 1000; // 12 horas en ms
-        
-        // Si pasaron menos de 12 horas, bloquear
-        if (diferenciaMs < diferencia12h) {
-          this.yaLike = true;
-          return;
-        }
-      }
-      
-      // Por defecto, permitir
-      this.yaLike = false;
+      // Verificar en sessionStorage si ya dio like en esta sesión
+      const yaLikeHoy = sessionStorage.getItem('yaLikeHoy');
+      this.yaLike = yaLikeHoy === 'true';
     },
     agregarLike() {
-      // Si ya dio like hace menos de 12 horas, no permitir
+      // Si ya dio like en esta sesión, no permitir
       if (this.yaLike) {
-        console.log('Ya diste like hace poco. Intenta después de 12 horas.');
         return;
       }
 
@@ -184,22 +124,10 @@ export default {
       this.yaLike = true;
       this.likeReciente = true;
       
-      // Guardar timestamp del like
-      const ahoraTiempoReal = new Date().toISOString();
-      localStorage.setItem('portafolioUltimoLike', ahoraTiempoReal);
-      this.ultimoLike = new Date(ahoraTiempoReal);
-      
-      // Guardar que este dispositivo dio like
-      const likesRegistrados = localStorage.getItem('portafolioLikes') || '[]';
-      const dispositivos = JSON.parse(likesRegistrados);
-      if (!dispositivos.includes(this.deviceId)) {
-        dispositivos.push(this.deviceId);
-      }
-      localStorage.setItem('portafolioLikes', JSON.stringify(dispositivos));
+      // Guardar que dio like en esta sesión
+      sessionStorage.setItem('yaLikeHoy', 'true');
 
-      this.guardarDatos();
-      
-      // Enviar a servidor (JSONBin)
+      // Enviar like al servidor
       this.enviarLikeAlServidor();
 
       // Animación
@@ -214,13 +142,52 @@ export default {
         });
       }
     },
-    guardarDatos() {
-      const datos = {
-        visitas: this.visitas,
-        likes: this.likes,
-        ultimaActualizacion: new Date().toISOString()
-      };
-      localStorage.setItem('portafolioStats', JSON.stringify(datos));
+    enviarLikeAlServidor() {
+      const apiUrl = '/.netlify/functions/contadores';
+      
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'like'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        this.likes = data.likes || 0;
+      })
+      .catch(() => {});
+    },
+    enviarVisitaAlServidor() {
+      const apiUrl = '/.netlify/functions/contadores';
+      
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'visita'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        this.visitas = data.visitas || 0;
+      })
+      .catch(() => {});
+    },
+    obtenerContadoresDelServidor() {
+      const apiUrl = '/.netlify/functions/contadores';
+      
+      fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        this.likes = data.likes || 0;
+        this.visitas = data.visitas || 0;
+      })
+      .catch(() => {});
     },
     formatearNumero(num) {
       if (num >= 1000000) {
@@ -229,43 +196,6 @@ export default {
         return (num / 1000).toFixed(1) + 'K';
       }
       return num;
-    },
-    enviarLikeAlServidor() {
-      const datos = {
-        portafolioLikes: this.likes,
-        portafolioVisitas: this.visitas,
-        ultimaActualizacion: new Date().toISOString()
-      };
-
-      // Usar localStorage como "servidor" local primero
-      localStorage.setItem('portafolioContadores', JSON.stringify(datos));
-    },
-    enviarVisitaAlServidor() {
-      const datos = {
-        portafolioLikes: this.likes,
-        portafolioVisitas: this.visitas,
-        ultimaActualizacion: new Date().toISOString()
-      };
-
-      // Usar localStorage como "servidor" local
-      localStorage.setItem('portafolioContadores', JSON.stringify(datos));
-    },
-    obtenerContadoresDelServidor() {
-      // Obtener contadores del localStorage (compartido entre pestañas)
-      const datosGuardados = localStorage.getItem('portafolioContadores');
-      if (datosGuardados) {
-        const datos = JSON.parse(datosGuardados);
-        if (datos.portafolioVisitas && datos.portafolioVisitas > this.visitas) {
-          this.visitas = datos.portafolioVisitas;
-        }
-        if (datos.portafolioLikes && datos.portafolioLikes > this.likes) {
-          this.likes = datos.portafolioLikes;
-        }
-      }
-    },
-    obtenerLikesDelServidor() {
-      // Este método ahora se llama a través de obtenerContadoresDelServidor
-      this.obtenerContadoresDelServidor();
     }
   }
 }
