@@ -74,16 +74,26 @@ export default {
     // Obtener ID único del dispositivo
     this.obtenerDeviceId();
 
-    // Verificar si ya dio like en esta sesión
+    // Verificar si ya dio like en las últimas 24 horas
     this.verificarSiYaLike();
 
     // Obtener contadores globales del servidor
     this.obtenerContadoresDelServidor();
 
-    // Incrementar visitas solo una vez por sesión
-    const visitaRegistrada = sessionStorage.getItem('visitaRegistrada');
-    if (!visitaRegistrada) {
-      sessionStorage.setItem('visitaRegistrada', 'true');
+    // Incrementar visitas solo UNA VEZ por dispositivo (no por sesión)
+    const visitasRegistradas = localStorage.getItem('portafolioVisitasRegistradas') || '[]';
+    let dispositivos = [];
+    
+    try {
+      dispositivos = JSON.parse(visitasRegistradas);
+    } catch {
+      dispositivos = [];
+    }
+    
+    // Si este dispositivo NO ha visitado, contar como nueva visita
+    if (!dispositivos.includes(this.deviceId)) {
+      dispositivos.push(this.deviceId);
+      localStorage.setItem('portafolioVisitasRegistradas', JSON.stringify(dispositivos));
       // Enviar nueva visita al servidor
       this.enviarVisitaAlServidor();
     }
@@ -110,13 +120,31 @@ export default {
       this.deviceId = deviceId;
     },
     verificarSiYaLike() {
-      // Verificar en sessionStorage si ya dio like en esta sesión
-      const yaLikeHoy = sessionStorage.getItem('yaLikeHoy');
-      this.yaLike = yaLikeHoy === 'true';
+      // Obtener timestamp del último like de este dispositivo
+      const ultimoLikeKey = `portafolioUltimoLike_${this.deviceId}`;
+      const ultimoLikeGuardado = localStorage.getItem(ultimoLikeKey);
+      
+      if (ultimoLikeGuardado) {
+        const ultimoLike = new Date(ultimoLikeGuardado);
+        const ahora = new Date();
+        const diferenciaMilisegundos = ahora - ultimoLike;
+        const ochoHoras = 8 * 60 * 60 * 1000; // 8 horas en ms
+        
+        // Si pasaron menos de 8 horas, bloquear
+        if (diferenciaMilisegundos < ochoHoras) {
+          this.yaLike = true;
+          console.log(`Ya diste like. Vuelve en ${Math.ceil((ochoHoras - diferenciaMilisegundos) / 1000 / 60)} minutos.`);
+          return;
+        }
+      }
+      
+      // Si pasaron más de 8 horas o nunca dio like, permitir
+      this.yaLike = false;
     },
     agregarLike() {
-      // Si ya dio like en esta sesión, no permitir
+      // Si ya dio like en las últimas 8 horas, no permitir
       if (this.yaLike) {
+        console.log('Ya diste like hace menos de 8 horas.');
         return;
       }
 
@@ -124,8 +152,9 @@ export default {
       this.yaLike = true;
       this.likeReciente = true;
       
-      // Guardar que dio like en esta sesión
-      sessionStorage.setItem('yaLikeHoy', 'true');
+      // Guardar timestamp del like con clave única por dispositivo
+      const ultimoLikeKey = `portafolioUltimoLike_${this.deviceId}`;
+      localStorage.setItem(ultimoLikeKey, new Date().toISOString());
 
       // Enviar like al servidor
       this.enviarLikeAlServidor();
