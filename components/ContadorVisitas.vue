@@ -67,12 +67,16 @@ export default {
       mostrarVisitas: false,
       likeReciente: false,
       yaLike: false,
-      deviceId: null
+      deviceId: null,
+      ultimoLike: null // timestamp del último like
     }
   },
   mounted() {
-    // Generar o recuperar ID único del dispositivo
+    // PRIMERO: Generar o recuperar ID único del dispositivo
     this.obtenerDeviceId();
+
+    // SEGUNDO: Verificar si ya dio like (necesita deviceId)
+    this.verificarSiYaLike();
 
     // Cargar datos del localStorage
     const datosGuardados = localStorage.getItem('portafolioStats');
@@ -82,11 +86,8 @@ export default {
       this.likes = datos.likes || 0;
     }
 
-    // Obtener likes globales del servidor
+    // Obtener likes globales del servidor al cargar
     this.obtenerLikesDelServidor();
-
-    // Verificar si ya dio like
-    this.verificarSiYaLike();
 
     // Incrementar visitas solo una vez por sesión
     const visitaRegistrada = sessionStorage.getItem('visitaRegistrada');
@@ -98,11 +99,6 @@ export default {
 
     // Escuchar cambios en localStorage desde otros dispositivos/pestañas
     window.addEventListener('storage', this.actualizarDatos);
-
-    // Sincronizar likes cada 5 segundos
-    setInterval(() => {
-      this.obtenerLikesDelServidor();
-    }, 5000);
 
     // Google Analytics: registrar vista de página
     if (window.gtag) {
@@ -147,11 +143,33 @@ export default {
     verificarSiYaLike() {
       const likesRegistrados = localStorage.getItem('portafolioLikes') || '[]';
       const dispositivos = JSON.parse(likesRegistrados);
-      this.yaLike = dispositivos.includes(this.deviceId);
+      
+      // Recuperar timestamp del último like
+      const ultimoLikeGuardado = localStorage.getItem('portafolioUltimoLike');
+      this.ultimoLike = ultimoLikeGuardado ? new Date(ultimoLikeGuardado) : null;
+      
+      // Si el dispositivo ya dio like hace menos de 12 horas, bloquear
+      if (dispositivos.includes(this.deviceId)) {
+        if (this.ultimoLike) {
+          const ahora = new Date();
+          const diferenciaMs = ahora - this.ultimoLike;
+          const diferencia12h = 12 * 60 * 60 * 1000; // 12 horas en ms
+          
+          if (diferenciaMs < diferencia12h) {
+            this.yaLike = true; // Bloqueado todavía
+            return;
+          }
+        }
+        // Si pasaron más de 12 horas, permitir nuevo like
+        this.yaLike = false;
+      } else {
+        this.yaLike = false;
+      }
     },
     agregarLike() {
-      // Si ya dio like, no permitir otro
+      // Si ya dio like hace menos de 12 horas, no permitir
       if (this.yaLike) {
+        console.log('Ya diste like hace poco. Intenta después de 12 horas.');
         return;
       }
 
@@ -159,15 +177,22 @@ export default {
       this.yaLike = true;
       this.likeReciente = true;
       
-      // Guardar que este dispositivo ya dio like
+      // Guardar timestamp del like
+      const ahoraTiempoReal = new Date().toISOString();
+      localStorage.setItem('portafolioUltimoLike', ahoraTiempoReal);
+      this.ultimoLike = new Date(ahoraTiempoReal);
+      
+      // Guardar que este dispositivo dio like
       const likesRegistrados = localStorage.getItem('portafolioLikes') || '[]';
       const dispositivos = JSON.parse(likesRegistrados);
-      dispositivos.push(this.deviceId);
+      if (!dispositivos.includes(this.deviceId)) {
+        dispositivos.push(this.deviceId);
+      }
       localStorage.setItem('portafolioLikes', JSON.stringify(dispositivos));
 
       this.guardarDatos();
       
-      // Enviar like a API pública para sincronizar
+      // Enviar a servidor (JSONBin)
       this.enviarLikeAlServidor();
 
       // Animación
@@ -181,44 +206,6 @@ export default {
           total_likes: this.likes
         });
       }
-    },
-    enviarLikeAlServidor() {
-      // Usar JSONBin.io API gratuita para guardar likes globales
-      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
-      
-      const datos = {
-        portafolioLikes: this.likes,
-        ultimaActualizacion: new Date().toISOString()
-      };
-
-      fetch(urlBin, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote' // Clave pública (no es sensible)
-        },
-        body: JSON.stringify(datos)
-      }).catch(err => console.log('No se pudo sincronizar likes:', err));
-    },
-    obtenerLikesDelServidor() {
-      // Obtener likes globales de JSONBin
-      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e/latest';
-      
-      fetch(urlBin, {
-        headers: {
-          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.record && data.record.portafolioLikes) {
-          // Actualizar solo si el servidor tiene más likes
-          if (data.record.portafolioLikes > this.likes) {
-            this.likes = data.record.portafolioLikes;
-          }
-        }
-      })
-      .catch(err => console.log('No se pudieron obtener likes:', err));
     },
     guardarDatos() {
       const datos = {
@@ -235,6 +222,42 @@ export default {
         return (num / 1000).toFixed(1) + 'K';
       }
       return num;
+    },
+    enviarLikeAlServidor() {
+      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e';
+      
+      const datos = {
+        portafolioLikes: this.likes,
+        ultimaActualizacion: new Date().toISOString()
+      };
+
+      fetch(urlBin, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
+        },
+        body: JSON.stringify(datos)
+      }).catch(() => {}); // Silenciar errores
+    },
+    obtenerLikesDelServidor() {
+      const urlBin = 'https://api.jsonbin.io/v3/b/672d5a7aad19ca34f8d47f3e/latest';
+      
+      fetch(urlBin, {
+        headers: {
+          'X-Master-Key': '$2a$10$0C7Ig1tqKZiKJDr.m5uote'
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('Error');
+        return res.json();
+      })
+      .then(data => {
+        if (data.record && data.record.portafolioLikes > this.likes) {
+          this.likes = data.record.portafolioLikes;
+        }
+      })
+      .catch(() => {}); // Silenciar errores
     }
   }
 }
