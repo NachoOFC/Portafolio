@@ -8,7 +8,12 @@
         <h3 class="text-lg font-semibold mb-4">Deja tu comentario</h3>
         
         <div v-if="!puedeComentar" class="text-yellow-400 text-sm">
-          💛 Primero debes dar like para comentar
+          <div v-if="proximoComentarioEn">
+            ⏰ Podrás comentar en {{ proximoComentarioEn }} horas
+          </div>
+          <div v-else>
+            💛 Primero debes dar like para comentar
+          </div>
         </div>
 
         <div v-else>
@@ -98,6 +103,26 @@
                 </div>
                 <p class="text-gray-300 text-sm">{{ comentario.mensaje }}</p>
               </div>
+
+              <!-- Botones si es comentario propio -->
+              <div v-if="misComentarios[comentario.id]" class="flex gap-2 flex-shrink-0">
+                <button
+                  @click="editarComentario(comentario.id)"
+                  :disabled="enviando"
+                  class="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition"
+                  title="Editar"
+                >
+                  ✏️
+                </button>
+                <button
+                  @click="borrarComentario(comentario.id)"
+                  :disabled="enviando"
+                  class="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded transition"
+                  title="Borrar"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -126,7 +151,10 @@ export default {
         'cat.png',
         'dog.png',
         'aliens.png'
-      ]
+      ],
+      proximoComentarioEn: null,
+      editando: null,
+      misComentarios: {} // { id: true/false }
     };
   },
   mounted() {
@@ -136,6 +164,9 @@ export default {
     // Verificar si puede comentar (si ya dio like)
     this.verificarSiPuedeComentar();
 
+    // Cargar comentarios propios del localStorage
+    this.cargarMisComentarios();
+
     // Cargar comentarios
     this.cargarComentarios();
   },
@@ -144,6 +175,31 @@ export default {
       const ultimoLikeKey = `portafolioUltimoLike_${this.dispositivo_id}`;
       const ultimoLike = localStorage.getItem(ultimoLikeKey);
       this.puedeComentar = !!ultimoLike; // True si existe el timestamp
+
+      // Verificar límite de 1 comentario por 24hrs
+      const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;
+      const ultimoComentario = localStorage.getItem(ultimoComentarioKey);
+      
+      if (ultimoComentario) {
+        const tiempoTranscurrido = Date.now() - parseInt(ultimoComentario);
+        const veinticuatroHoras = 24 * 60 * 60 * 1000;
+        
+        if (tiempoTranscurrido < veinticuatroHoras) {
+          this.puedeComentar = false;
+          const tiempoRestante = veinticuatroHoras - tiempoTranscurrido;
+          const horasRestantes = Math.ceil(tiempoRestante / (60 * 60 * 1000));
+          this.proximoComentarioEn = horasRestantes;
+        }
+      }
+    },
+    cargarMisComentarios() {
+      const misComentariosKey = `portafolioMisComentarios_${this.dispositivo_id}`;
+      const stored = localStorage.getItem(misComentariosKey);
+      this.misComentarios = stored ? JSON.parse(stored) : {};
+    },
+    guardarMisComentarios() {
+      const misComentariosKey = `portafolioMisComentarios_${this.dispositivo_id}`;
+      localStorage.setItem(misComentariosKey, JSON.stringify(this.misComentarios));
     },
     cargarComentarios() {
       fetch('/.netlify/functions/comentarios')
@@ -175,8 +231,24 @@ export default {
           mensaje: this.nuevoComentario.mensaje
         })
       })
-        .then(res => res.json())
+        .then(res => {
+          if (res.status === 429) {
+            throw new Error('Solo puedes comentar una vez cada 24 horas');
+          }
+          return res.json();
+        })
         .then(data => {
+          // Guardar ID del comentario en localStorage
+          const commentId = data.id;
+          if (commentId) {
+            this.misComentarios[commentId] = true;
+            this.guardarMisComentarios();
+          }
+
+          // Guardar timestamp del último comentario (límite 24hrs)
+          const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;
+          localStorage.setItem(ultimoComentarioKey, Date.now().toString());
+
           // Resetear formulario
           this.nuevoComentario = {
             nombre: '',
@@ -186,6 +258,9 @@ export default {
           // Mostrar mensaje de éxito
           alert('✅ Comentario enviado. Será visible cuando lo apruebe.');
           
+          // Actualizar estado de puedeComentar
+          this.verificarSiPuedeComentar();
+
           // Google Analytics
           if (window.gtag) {
             window.gtag('event', 'comentario_enviado');
@@ -193,7 +268,7 @@ export default {
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('❌ Error al enviar comentario');
+          alert('❌ ' + err.message);
         })
         .finally(() => {
           this.enviando = false;
@@ -217,6 +292,75 @@ export default {
       if (dias < 7) return `${dias}d`;
 
       return fecha_obj.toLocaleDateString('es-ES');
+    },
+    editarComentario(id) {
+      const comentario = this.comentarios.find(c => c.id === id);
+      if (!comentario) return;
+
+      const nuevoMensaje = prompt('Edita tu comentario:', comentario.mensaje);
+      if (nuevoMensaje === null || nuevoMensaje.trim() === '') return;
+
+      this.enviando = true;
+
+      fetch('/.netlify/functions/comentarios', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: id,
+          dispositivo_id: this.dispositivo_id,
+          mensaje: nuevoMensaje
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Actualizar comentario en la lista
+          const index = this.comentarios.findIndex(c => c.id === id);
+          if (index !== -1) {
+            this.comentarios[index].mensaje = nuevoMensaje;
+          }
+          alert('✅ Comentario actualizado');
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Error al actualizar comentario');
+        })
+        .finally(() => {
+          this.enviando = false;
+        });
+    },
+    borrarComentario(id) {
+      if (!confirm('¿Estás seguro de que quieres borrar tu comentario?')) return;
+
+      this.enviando = true;
+
+      fetch('/.netlify/functions/comentarios', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: id,
+          dispositivo_id: this.dispositivo_id
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          // Eliminar de la lista
+          this.comentarios = this.comentarios.filter(c => c.id !== id);
+          // Eliminar del localStorage
+          delete this.misComentarios[id];
+          this.guardarMisComentarios();
+          alert('✅ Comentario eliminado');
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('❌ Error al eliminar comentario');
+        })
+        .finally(() => {
+          this.enviando = false;
+        });
     }
   }
 };
