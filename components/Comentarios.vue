@@ -22,7 +22,7 @@
             v-model="nuevoComentario.nombre"
             type="text"
             placeholder="Tu nombre"
-            maxlength="100"
+            maxlength="20"
             class="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4 border border-gray-600 focus:border-blue-500 focus:outline-none"
           />
 
@@ -55,16 +55,16 @@
           <textarea
             v-model="nuevoComentario.mensaje"
             placeholder="Tu comentario..."
-            maxlength="500"
+            maxlength="1200"
             rows="4"
             class="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4 border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
           />
 
           <div class="flex justify-between items-center">
-            <span class="text-xs text-gray-400">{{ nuevoComentario.mensaje.length }}/500</span>
+            <span class="text-xs text-gray-400">{{ contarPalabras(nuevoComentario.mensaje) }}/200 palabras</span>
             <button
               @click="enviarComentario"
-              :disabled="enviando || !nuevoComentario.nombre || !nuevoComentario.mensaje || !nuevoComentario.icono"
+              :disabled="enviando || !nuevoComentario.nombre || !nuevoComentario.mensaje || !nuevoComentario.icono || contarPalabras(nuevoComentario.mensaje) > 200"
               class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed rounded font-semibold transition"
             >
               {{ enviando ? 'Enviando...' : 'Enviar comentario' }}
@@ -87,7 +87,7 @@
             :key="comentario.id"
             class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition"
           >
-            <div class="flex items-start gap-3">
+            <div class="flex gap-3">
               <!-- Avatar del icono -->
               <div class="flex-shrink-0">
                 <img
@@ -95,20 +95,22 @@
                   :alt="comentario.nombre"
                   class="w-10 h-10 rounded-full bg-gray-700 object-contain"
                 />
-              </div>              <!-- Contenido -->
-              <div class="flex-grow">
-                <div class="flex items-center gap-2 mb-1">
-                  <p class="font-semibold">{{ comentario.nombre }}</p>
-                  <span class="text-xs text-gray-400">{{ formatearFecha(comentario.creado_en) }}</span>
+              </div>
+
+              <!-- Contenido principal -->
+              <div class="flex-grow min-w-0">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <p class="font-semibold truncate">{{ comentario.nombre }}</p>
+                  <span class="text-xs text-gray-400 flex-shrink-0">{{ formatearFecha(comentario.creado_en) }}</span>
                   <!-- Badge de estado -->
-                  <span v-if="comentario.aprobado === false" class="text-xs px-2 py-0.5 bg-yellow-900 text-yellow-200 rounded">
+                  <span v-if="comentario.aprobado === false" class="text-xs px-2 py-0.5 bg-yellow-900 text-yellow-200 rounded flex-shrink-0">
                     Pendiente
                   </span>
-                  <span v-else class="text-xs px-2 py-0.5 bg-green-900 text-green-200 rounded">
+                  <span v-else class="text-xs px-2 py-0.5 bg-green-900 text-green-200 rounded flex-shrink-0">
                     Aprobado
                   </span>
                 </div>
-                <p class="text-gray-300 text-sm break-words">{{ comentario.mensaje }}</p>
+                <p class="text-gray-300 text-sm break-words leading-relaxed">{{ comentario.mensaje }}</p>
               </div>
 
               <!-- Botones si es comentario propio PENDIENTE (no aprobado) -->
@@ -314,6 +316,10 @@ export default {
       if (dias < 7) return `${dias}d`;
 
       return fecha_obj.toLocaleDateString('es-ES');
+    },
+    contarPalabras(texto) {
+      if (!texto) return 0;
+      return texto.trim().split(/\s+/).filter(word => word.length > 0).length;
     },
     editarComentario(id) {
       const comentario = this.comentarios.find(c => c.id === id);
