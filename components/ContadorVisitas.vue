@@ -26,6 +26,14 @@
       <i class="fas fa-heart text-xl mb-1" :class="{ 'animate-ping': likeReciente }"></i>
       <span class="text-xs font-bold">{{ formatearNumero(likes) }}</span>
     </div>
+
+    <!-- Botón de comentarios -->
+    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 p-4 flex flex-col items-center justify-center w-16 h-16 cursor-pointer group relative"
+      @click="irAComentarios"
+      :title="`${comentarios} comentarios`">
+      <i class="fas fa-comments text-xl mb-1"></i>
+      <span class="text-xs font-bold">{{ formatearNumero(comentarios) }}</span>
+    </div>
   </div>
 
   <!-- Mobile: Flotante inferior horizontal, más pequeño -->
@@ -55,6 +63,14 @@
       <i class="fas fa-heart text-sm mb-0.5" :class="{ 'animate-ping': likeReciente }"></i>
       <span class="text-xs font-bold">{{ formatearNumero(likes) }}</span>
     </div>
+
+    <!-- Botón de comentarios móvil -->
+    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-full shadow-lg transition-all duration-300 p-2 flex flex-col items-center justify-center w-12 h-12 cursor-pointer relative"
+      @click="irAComentarios"
+      :title="`${comentarios} comentarios`">
+      <i class="fas fa-comments text-sm mb-0.5"></i>
+      <span class="text-xs font-bold">{{ formatearNumero(comentarios) }}</span>
+    </div>
   </div>
 </template>
 
@@ -64,6 +80,7 @@ export default {
     return {
       visitas: 0,
       likes: 0,
+      comentarios: 0,
       mostrarVisitas: false,
       likeReciente: false,
       yaLike: false,
@@ -225,6 +242,23 @@ export default {
         this.visitas = data.visitas || 0;
       })
       .catch(() => {});
+
+      // Obtener número de comentarios aprobados
+      fetch('/.netlify/functions/comentarios')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          this.comentarios = data.filter(c => c.aprobado === true).length;
+        }
+      })
+      .catch(() => {});
+    },
+    irAComentarios() {
+      // Scroll a la sección de comentarios
+      const elementoComentarios = document.getElementById('seccion-comentarios');
+      if (elementoComentarios) {
+        elementoComentarios.scrollIntoView({ behavior: 'smooth' });
+      }
     },
     formatearNumero(num) {
       if (num >= 1000000) {

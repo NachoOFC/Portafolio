@@ -15,15 +15,73 @@
     </transition-group>
   </div>
 
-  <section class="py-12 bg-gray-900 text-white">
+  <section id="seccion-comentarios" class="py-12 bg-gray-900 text-white">
     <div class="max-w-4xl mx-auto px-4">
       <h2 class="text-3xl font-bold mb-8 text-center text-gradient">Lo que dicen de mí</h2>
 
       <!-- Formulario de comentario -->
-      <div class="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
+      <div v-if="puedeComentar" class="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
         <h3 class="text-lg font-semibold mb-4">Deja tu comentario</h3>
-        
-        <div v-if="!puedeComentar" class="text-yellow-400 text-sm">
+
+        <!-- Nombre -->
+        <input
+          v-model="nuevoComentario.nombre"
+          type="text"
+          placeholder="Tu nombre"
+          maxlength="20"
+          class="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4 border border-gray-600 focus:border-blue-500 focus:outline-none"
+        />
+
+        <!-- Selector de icono -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-300 mb-2">Elige tu icono:</p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="ico in iconos"
+              :key="ico"
+              @click="nuevoComentario.icono = ico"
+              :class="[
+                'p-2 rounded border-2 transition',
+                nuevoComentario.icono === ico
+                  ? 'border-blue-500 bg-blue-500/20'
+                  : 'border-gray-600 hover:border-gray-500'
+              ]"
+              :title="ico.replace('.png', '')"
+            >
+              <img
+                :src="`/comentarios/${ico}`"
+                :alt="ico"
+                class="w-6 h-6"
+              />
+            </button>
+          </div>
+        </div>
+
+        <!-- Mensaje -->
+        <textarea
+          v-model="nuevoComentario.mensaje"
+          placeholder="Tu comentario..."
+          maxlength="1200"
+          rows="4"
+          class="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4 border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
+        />
+
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-400">{{ contarPalabras(nuevoComentario.mensaje) }}/200 palabras</span>
+          <button
+            @click="enviarComentario"
+            :disabled="enviando || !nuevoComentario.nombre || !nuevoComentario.mensaje || !nuevoComentario.icono || contarPalabras(nuevoComentario.mensaje) > 200"
+            class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed rounded font-semibold transition"
+          >
+            {{ enviando ? 'Enviando...' : 'Enviar comentario' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensaje de espera (cuando no puede comentar) -->
+      <div v-else class="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-700">
+        <h3 class="text-lg font-semibold mb-4">Deja tu comentario</h3>
+        <div class="text-yellow-400 text-sm">
           <div v-if="proximoComentarioEn">
             ⏰ Podrás comentar en {{ proximoComentarioEn }} horas
           </div>
@@ -34,75 +92,26 @@
             💛 Primero debes dar like para comentar
           </div>
         </div>
-
-        <div v-else>
-          <!-- Nombre -->
-          <input
-            v-model="nuevoComentario.nombre"
-            type="text"
-            placeholder="Tu nombre"
-            maxlength="20"
-            class="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4 border border-gray-600 focus:border-blue-500 focus:outline-none"
-          />
-
-          <!-- Selector de icono -->
-          <div class="mb-4">
-            <p class="text-sm text-gray-300 mb-2">Elige tu icono:</p>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="ico in iconos"
-                :key="ico"
-                @click="nuevoComentario.icono = ico"
-                :class="[
-                  'p-2 rounded border-2 transition',
-                  nuevoComentario.icono === ico
-                    ? 'border-blue-500 bg-blue-500/20'
-                    : 'border-gray-600 hover:border-gray-500'
-                ]"
-                :title="ico.replace('.png', '')"
-              >
-                <img
-                  :src="`/comentarios/${ico}`"
-                  :alt="ico"
-                  class="w-6 h-6"
-                />
-              </button>
-            </div>
-          </div>
-
-          <!-- Mensaje -->
-          <textarea
-            v-model="nuevoComentario.mensaje"
-            placeholder="Tu comentario..."
-            maxlength="1200"
-            rows="4"
-            class="w-full bg-gray-700 text-white px-4 py-2 rounded mb-4 border border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
-          />
-
-          <div class="flex justify-between items-center">
-            <span class="text-xs text-gray-400">{{ contarPalabras(nuevoComentario.mensaje) }}/200 palabras</span>
-            <button
-              @click="enviarComentario"
-              :disabled="enviando || !nuevoComentario.nombre || !nuevoComentario.mensaje || !nuevoComentario.icono || contarPalabras(nuevoComentario.mensaje) > 200"
-              class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed rounded font-semibold transition"
-            >
-              {{ enviando ? 'Enviando...' : 'Enviar comentario' }}
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- Lista de comentarios -->
       <div>
-        <h3 class="text-xl font-semibold mb-4">Comentarios ({{ comentarios.length }})</h3>
+        <!-- Comentarios pendientes -->
+        <div v-if="comentariosPendientes.length > 0" class="mb-6 p-4 bg-yellow-900 bg-opacity-20 border border-yellow-700 rounded-lg">
+          <p class="text-yellow-300 text-sm">
+            ⏳ Tienes {{ comentariosPendientes.length }} comentario{{ comentariosPendientes.length > 1 ? 's' : '' }} pendiente{{ comentariosPendientes.length > 1 ? 's' : '' }} de aprobación. Será visible cuando lo apruebe.
+          </p>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Comentarios ({{ comentariosAprobados.length }})</h3>
         
-        <div v-if="comentarios.length === 0" class="text-center text-gray-400 py-8">
+        <div v-if="comentariosAprobados.length === 0" class="text-center text-gray-400 py-8">
           Aún no hay comentarios. ¡Sé el primero! 💬
         </div>
 
         <div v-else class="space-y-4">
           <div
-            v-for="comentario in comentarios"
+            v-for="comentario in comentariosAprobados"
             :key="comentario.id"
             class="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600 transition relative"
             :class="obtenerColorMedalla(obtenerPosicion(comentario.id))"
@@ -127,13 +136,6 @@
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
                   <p class="font-semibold truncate">{{ comentario.nombre }}</p>
                   <span class="text-xs text-gray-400 flex-shrink-0">{{ formatearFecha(comentario.creado_en) }}</span>
-                  <!-- Badge de estado -->
-                  <span v-if="comentario.aprobado === false" class="text-xs px-2 py-0.5 bg-yellow-900 text-yellow-200 rounded flex-shrink-0">
-                    Pendiente
-                  </span>
-                  <span v-else class="text-xs px-2 py-0.5 bg-green-900 text-green-200 rounded flex-shrink-0">
-                    Aprobado
-                  </span>
                 </div>
                 <p class="text-gray-300 text-sm break-words leading-relaxed">{{ comentario.mensaje }}</p>
                 
@@ -239,6 +241,14 @@ export default {
       // Actualizar inmediatamente sin espera
       this.verificarSiPuedeComentar();
     });
+  },
+  computed: {
+    comentariosAprobados() {
+      return this.comentarios.filter(c => c.aprobado === true);
+    },
+    comentariosPendientes() {
+      return this.comentarios.filter(c => c.aprobado === false);
+    }
   },
   methods: {
     verificarSiPuedeComentar() {
