@@ -96,11 +96,56 @@
 
       <!-- Lista de comentarios -->
       <div>
-        <!-- Comentarios pendientes -->
-        <div v-if="comentariosPendientes.length > 0" class="mb-6 p-4 bg-yellow-900 bg-opacity-20 border border-yellow-700 rounded-lg">
-          <p class="text-yellow-300 text-sm">
-            ⏳ Tienes {{ comentariosPendientes.length }} comentario{{ comentariosPendientes.length > 1 ? 's' : '' }} pendiente{{ comentariosPendientes.length > 1 ? 's' : '' }} de aprobación. Será visible cuando lo apruebe.
-          </p>
+        <!-- Comentarios pendientes (los del usuario) -->
+        <div v-if="comentariosPendientes.length > 0" class="mb-6">
+          <h4 class="text-lg font-semibold mb-3 text-yellow-300">⏳ Pendientes de aprobación</h4>
+          <div class="space-y-4">
+            <div
+              v-for="comentario in comentariosPendientes"
+              :key="comentario.id"
+              class="bg-gray-800 rounded-lg p-4 border border-yellow-700 hover:border-yellow-600 transition relative"
+            >
+              <div class="flex gap-3">
+                <!-- Avatar del icono -->
+                <div class="flex-shrink-0">
+                  <img
+                    :src="`/comentarios/${comentario.icono}`"
+                    :alt="comentario.nombre"
+                    class="w-10 h-10 rounded-full bg-gray-700 object-contain"
+                  />
+                </div>
+
+                <!-- Contenido principal -->
+                <div class="flex-grow min-w-0">
+                  <div class="flex items-center gap-2 mb-1 flex-wrap">
+                    <p class="font-semibold truncate">{{ comentario.nombre }}</p>
+                    <span class="text-xs text-gray-400 flex-shrink-0">{{ formatearFecha(comentario.creado_en) }}</span>
+                  </div>
+                  <p class="text-gray-300 text-sm break-words leading-relaxed">{{ comentario.mensaje }}</p>
+                  
+                  <!-- Botones de editar/borrar -->
+                  <div class="mt-2 flex gap-2">
+                    <button
+                      @click="editarComentario(comentario.id)"
+                      :disabled="enviando"
+                      class="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition"
+                      title="Editar"
+                    >
+                      ✏️ Editar
+                    </button>
+                    <button
+                      @click="borrarComentario(comentario.id)"
+                      :disabled="enviando"
+                      class="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded transition"
+                      title="Borrar"
+                    >
+                      🗑️ Borrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <h3 class="text-xl font-semibold mb-4">Comentarios ({{ comentariosAprobados.length }})</h3>
@@ -153,26 +198,6 @@
                     {{ misLikes[comentario.id] ? '❤️' : '🤍' }} {{ comentario.likes || 0 }}
                   </button>
                 </div>
-              </div>
-
-              <!-- Botones si es comentario propio PENDIENTE (no aprobado) -->
-              <div v-if="misComentarios[comentario.id] && comentario.aprobado === false" class="flex gap-2 flex-shrink-0">
-                <button
-                  @click="editarComentario(comentario.id)"
-                  :disabled="enviando"
-                  class="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition"
-                  title="Editar"
-                >
-                  ✏️
-                </button>
-                <button
-                  @click="borrarComentario(comentario.id)"
-                  :disabled="enviando"
-                  class="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded transition"
-                  title="Borrar"
-                >
-                  🗑️
-                </button>
               </div>
             </div>
           </div>
@@ -239,6 +264,7 @@ export default {
     // Escuchar evento cuando se da like (desde ContadorVisitas)
     window.addEventListener('likeGiven', () => {
       // Actualizar inmediatamente sin espera
+      this.cargarComentarios();
       this.verificarSiPuedeComentar();
     });
   },
@@ -323,8 +349,13 @@ export default {
               if (comentario.yaLike) {
                 this.misLikes[comentario.id] = true;
               }
+              // Sincronizar misComentarios: si es del usuario, marcar como tal
+              if (comentario.aprobado === false) {
+                this.misComentarios[comentario.id] = true;
+              }
             });
             this.guardarMisLikes();
+            this.guardarMisComentarios();
             
             // IMPORTANTE: Limpiar bloqueo de 24hrs si el comentario fue eliminado/rechazado
             const comentarioIds = new Set(this.comentarios.map(c => c.id));
