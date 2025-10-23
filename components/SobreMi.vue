@@ -1,7 +1,23 @@
 <template>
   <section class="min-h-screen flex items-center justify-center py-12 bg-gray-900 text-white">
     <div class="max-w-4xl w-full mx-auto px-4 flex flex-col items-center justify-center">
-      <img src="/yo.jpg" alt="Ignacio" class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg mb-4" />
+      <!-- Foto de perfil rotante -->
+      <div class="relative w-32 h-32 mb-4 perspective">
+        <img 
+          v-if="mostrarFotoAnimada" 
+          src="/nachoanimado.png" 
+          alt="Nacho Animado" 
+          class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg transition-opacity duration-500"
+          :style="{ opacity: mostrarFotoAnimada ? 1 : 0 }"
+        />
+        <img 
+          v-if="!mostrarFotoAnimada" 
+          src="/yo.jpg" 
+          alt="Ignacio" 
+          class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg transition-opacity duration-500"
+          :style="{ opacity: !mostrarFotoAnimada ? 1 : 0 }"
+        />
+      </div>
       <div class="flex flex-row items-center justify-center gap-4 mb-4">
         <a href="https://github.com/NachoOFC" target="_blank" rel="noopener" class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
           <img src="/iconos/github_dark.svg" alt="GitHub" class="w-7 h-7" />
@@ -71,6 +87,8 @@ export default {
       currentTextIndexSecondary: 0,
       isTyping: false,
       isTypingSecondary: false,
+      mostrarFotoAnimada: false,
+      intervaloFoto: null,
       stacks: [
         { label: 'Nuxt', icon: '/iconos/nuxt.svg' },
         { label: 'Vue', icon: '/iconos/vue.svg' },
@@ -86,6 +104,16 @@ export default {
   mounted() {
     this.startTyping();
     this.startTypingSecondary();
+    
+    // Iniciar rotación de fotos cada 10 segundos
+    this.intervaloFoto = setInterval(() => {
+      this.mostrarFotoAnimada = !this.mostrarFotoAnimada;
+    }, 10000);
+  },
+  beforeUnmount() {
+    if (this.intervaloFoto) {
+      clearInterval(this.intervaloFoto);
+    }
   },
   methods: {
     startTyping() {
