@@ -262,19 +262,15 @@ export default {
     }, 3000);
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
-    window.addEventListener('likeGiven', () => {
+    window.addEventListener('likeGiven', async () => {
       // Pequeño delay para asegurar que el localStorage se actualizó
-      setTimeout(async () => {
-        await new Promise(resolve => {
-          // Cargar comentarios primero
-          this.cargarComentarios();
-          // Luego chequear si puede comentar
-          setTimeout(() => {
-            this.verificarSiPuedeComentar();
-            resolve();
-          }, 50);
-        });
-      }, 50);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Cargar comentarios y esperar a que termine
+      await this.cargarComentarios();
+      
+      // Luego chequear si puede comentar
+      this.verificarSiPuedeComentar();
     });
   },
   computed: {
@@ -342,11 +338,11 @@ export default {
       const misLikesKey = `portafolioMisLikes_${this.dispositivo_id}`;
       localStorage.setItem(misLikesKey, JSON.stringify(this.misLikes));
     },
-    cargarComentarios() {
+    async cargarComentarios() {
       // Pasar dispositivo_id para que el backend retorne comentarios aprobados + pendientes del usuario
       const url = `/.netlify/functions/comentarios?dispositivo_id=${this.dispositivo_id}`;
       
-      fetch(url)
+      return fetch(url)
         .then(res => res.json())
         .then(data => {
           // Filtrar para solo obtener comentarios válidos
@@ -386,6 +382,8 @@ export default {
             
             // Verificar si puede comentar
             this.verificarSiPuedeComentar();
+            
+            return data;
           }
         })
         .catch(err => console.error('Error cargando comentarios:', err));
