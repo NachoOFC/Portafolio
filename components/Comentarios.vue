@@ -1,4 +1,20 @@
 <template>
+  <!-- Toasts -->
+  <div class="fixed top-4 right-4 z-50 space-y-2">
+    <transition-group name="toast" tag="div">
+      <div
+        v-for="toast in toasts"
+        :key="toast.id"
+        :class="[
+          'px-4 py-3 rounded-lg font-medium text-white shadow-lg animate-pulse',
+          toast.tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+        ]"
+      >
+        {{ toast.mensaje }}
+      </div>
+    </transition-group>
+  </div>
+
   <section class="py-12 bg-gray-900 text-white">
     <div class="max-w-4xl mx-auto px-4">
       <h2 class="text-3xl font-bold mb-8 text-center text-gradient">Lo que dicen de mí</h2>
@@ -193,7 +209,8 @@ export default {
       proximoComentarioEn: null,
       editando: null,
       misComentarios: {}, // { id: true/false }
-      misLikes: {} // { comentario_id: true/false }
+      misLikes: {}, // { comentario_id: true/false }
+      toasts: [] // Para notificaciones
     };
   },
   mounted() {
@@ -367,7 +384,7 @@ export default {
             mensaje: ''
           };
           // Mostrar mensaje de éxito
-          alert('✅ Comentario enviado. Será visible cuando lo apruebe.');
+          this.showToast('✅ Comentario enviado. Será visible cuando lo apruebe.', 'success');
           
           // Actualizar estado de puedeComentar
           this.verificarSiPuedeComentar();
@@ -379,7 +396,7 @@ export default {
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('❌ ' + err.message);
+          this.showToast('❌ ' + err.message, 'error');
         })
         .finally(() => {
           this.enviando = false;
@@ -410,11 +427,12 @@ export default {
     },
     obtenerRanking() {
       // Retorna array con los 3 primeros por likes, ordenados descendente
+      // Si hay empate de likes, más viejo primero (creado_en ASC)
       const ordenados = [...this.comentarios].sort((a, b) => {
         if (b.likes !== a.likes) {
-          return b.likes - a.likes;
+          return b.likes - a.likes; // Mayor likes primero
         }
-        return new Date(b.creado_en) - new Date(a.creado_en);
+        return new Date(a.creado_en) - new Date(b.creado_en); // Más viejo primero si empate
       });
       return ordenados.slice(0, 3);
     },
@@ -482,7 +500,7 @@ export default {
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('❌ Error al dar like');
+          this.showToast('❌ Error al dar like', 'error');
         });
     },
     quitarLikeComentario(id) {
@@ -519,7 +537,7 @@ export default {
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('❌ Error al quitar like');
+          this.showToast('❌ Error al quitar like', 'error');
         });
     },
     editarComentario(id) {
@@ -544,13 +562,13 @@ export default {
       })
         .then(res => res.json())
         .then(data => {
-          alert('✅ Comentario actualizado');
+          this.showToast('✅ Comentario actualizado', 'success');
           // Recargar comentarios sin recargar página
           this.cargarComentarios();
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('❌ Error al actualizar comentario');
+          this.showToast('❌ Error al actualizar comentario', 'error');
         })
         .finally(() => {
           this.enviando = false;
@@ -585,15 +603,28 @@ export default {
           this.proximoComentarioEn = null;
           this.verificarSiPuedeComentar();
           
-          alert('✅ Comentario eliminado');
+          this.showToast('✅ Comentario eliminado', 'success');
         })
         .catch(err => {
           console.error('Error:', err);
-          alert('❌ Error al eliminar comentario');
+          this.showToast('❌ Error al eliminar comentario', 'error');
         })
         .finally(() => {
           this.enviando = false;
         });
+    },
+    showToast(mensaje, tipo = 'info', duracion = 2000) {
+      const id = Date.now();
+      const toast = {
+        id,
+        mensaje,
+        tipo // 'success', 'error', 'info'
+      };
+      this.toasts.push(toast);
+      
+      setTimeout(() => {
+        this.toasts = this.toasts.filter(t => t.id !== id);
+      }, duracion);
     }
   }
 };
@@ -605,5 +636,24 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from {
+  transform: translateX(30px);
+  opacity: 0;
+}
+
+.toast-leave-to {
+  transform: translateX(30px);
+  opacity: 0;
+}
+
+.toast-move {
+  transition: transform 0.3s ease;
 }
 </style>
