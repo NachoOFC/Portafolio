@@ -241,17 +241,22 @@ export default {
     };
   },
   mounted() {
-    // Obtener dispositivo ID
+    // Obtener dispositivo ID PRIMERO (es crítico)
     this.dispositivo_id = localStorage.getItem('portafolioDeviceId');
-
-    // Verificar si puede comentar (si ya dio like)
-    this.verificarSiPuedeComentar();
+    
+    if (!this.dispositivo_id) {
+      console.error('No dispositivo_id found');
+      return;
+    }
 
     // Cargar comentarios propios del localStorage
     this.cargarMisComentarios();
 
     // Cargar mis likes del localStorage
     this.cargarMisLikes();
+
+    // Verificar si puede comentar (si ya dio like)
+    this.verificarSiPuedeComentar();
 
     // Cargar comentarios
     this.cargarComentarios();
