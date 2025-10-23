@@ -227,7 +227,7 @@
                   <p class="font-semibold truncate">{{ comentario.nombre }}</p>
                   <span class="text-xs text-gray-400 flex-shrink-0">{{ formatearFecha(comentario.creado_en) }}</span>
                 </div>
-                <p class="text-gray-300 text-sm break-words leading-relaxed">{{ comentario.mensaje }}</p>
+                <p class="text-gray-300 text-sm break-words leading-relaxed" v-html="colorearHashtags(comentario.mensaje)"></p>
                 
                 <!-- Referencias (fotos y proyectos) -->
                 <div v-if="comentario.referencias && comentario.referencias.length > 0" class="mt-3 grid grid-cols-3 gap-2">
@@ -284,15 +284,21 @@
               ✕
             </button>
           </div>
-          <div class="p-4 space-y-2">
+          <div class="p-4 grid grid-cols-2 gap-3">
             <button
               v-for="(proyecto, idx) in proyectos"
               :key="idx"
               @click="agregarReferenciaProyecto(proyecto)"
-              class="w-full text-left p-3 bg-gray-700 hover:bg-gray-600 rounded transition border border-gray-600 hover:border-gray-500"
+              class="relative group overflow-hidden rounded border border-gray-600 hover:border-blue-500 transition"
             >
-              <div class="font-semibold text-blue-400">#proyectos:{{ proyecto.id }}</div>
-              <div class="text-sm text-gray-300">{{ proyecto.titulo }}</div>
+              <img
+                :src="proyecto.imagen"
+                :alt="proyecto.titulo"
+                class="w-full h-24 object-cover group-hover:scale-110 transition"
+              />
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="text-sm text-center px-2">{{ proyecto.titulo }}</span>
+              </div>
             </button>
           </div>
         </div>
@@ -861,10 +867,10 @@ export default {
         });
     },
     extraerReferenciasDelMensaje(mensaje) {
-      // Buscar referencias en formato: #proyectos:nombre-proyecto o #file:nombre-archivo
+      // Buscar referencias en formato: #proyectos:nombre-proyecto o #fotos:nombre-archivo
       const referencias = [];
       
-      // Patrón para proyectos: #proyectos:sistema-monitoreo
+      // Patrón para proyectos: #proyectos:smtr
       const proyectoPattern = /#proyectos:([a-zA-Z0-9\-_]+)/g;
       let match;
       
@@ -883,8 +889,8 @@ export default {
         }
       }
       
-      // Patrón para archivos: #file:grupo.png
-      const filePattern = /#file:([a-zA-Z0-9\-_.]+)/g;
+      // Patrón para archivos: #fotos:grupo.png
+      const filePattern = /#fotos:([a-zA-Z0-9\-_.]+)/g;
       while ((match = filePattern.exec(mensaje)) !== null) {
         const nombreArchivo = match[1];
         
@@ -898,6 +904,14 @@ export default {
       }
       
       return referencias;
+    },
+    colorearHashtags(texto) {
+      // Colorear hashtags en azul: #proyectos:xxx y #fotos:xxx
+      return texto
+        .replace(/(#proyectos:[a-zA-Z0-9\-_]+)/g, '<span class="text-blue-400 font-semibold">$1</span>')
+        .replace(/(#fotos:[a-zA-Z0-9\-_.]+)/g, '<span class="text-blue-400 font-semibold">$1</span>')
+        // Escapar saltos de línea en HTML
+        .replace(/\n/g, '<br>');
     },
     agregarReferenciaProyecto(proyecto) {
       // Verificar si ya existe esta referencia
@@ -937,7 +951,7 @@ export default {
       this.nuevoComentario.referencias.push({
         tipo: 'foto',
         nombre: nombreFoto,
-        etiqueta: `#file:${nombreFoto}`,
+        etiqueta: `#fotos:${nombreFoto}`,
         url: `/Hackaton/${nombreFoto}`,
         titulo: nombreFoto
       });
