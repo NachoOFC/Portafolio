@@ -674,9 +674,9 @@ export default {
     },
     obtenerColorMedalla(posicion) {
       const colores = {
-        1: 'ring-2 ring-yellow-500',
-        2: 'ring-2 ring-gray-400',
-        3: 'ring-2 ring-orange-600'
+        1: 'bg-yellow-900/40 border-yellow-500/50 ring-2 ring-yellow-500',
+        2: 'bg-gray-700/40 border-gray-400/50 ring-2 ring-gray-400',
+        3: 'bg-orange-900/40 border-orange-600/50 ring-2 ring-orange-600'
       };
       return colores[posicion] || '';
     },
