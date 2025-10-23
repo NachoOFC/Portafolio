@@ -57,6 +57,51 @@
           </div>
         </div>
 
+        <!-- Botones de referencias (Proyectos y Fotos) -->
+        <div class="mb-4 flex gap-2 flex-wrap">
+          <button
+            @click="mostrarSelectorProyectos = true"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-semibold transition flex items-center gap-2"
+          >
+            📁 Agregar Proyecto
+          </button>
+          <button
+            @click="mostrarSelectorFotos = true"
+            class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-semibold transition flex items-center gap-2"
+          >
+            🖼️ Agregar Foto
+          </button>
+        </div>
+
+        <!-- Vista previa de referencias agregadas -->
+        <div v-if="nuevoComentario.referencias.length > 0" class="mb-4 grid grid-cols-3 gap-3">
+          <div
+            v-for="(ref, idx) in nuevoComentario.referencias"
+            :key="idx"
+            class="relative group"
+          >
+            <div class="bg-gray-700 rounded overflow-hidden h-24 flex items-center justify-center">
+              <img
+                v-if="ref.tipo === 'foto'"
+                :src="ref.url"
+                :alt="ref.nombre"
+                class="w-full h-full object-cover"
+              />
+              <div v-else class="text-center text-xs px-2">
+                <div class="font-semibold text-blue-400">📁</div>
+                <div class="truncate">{{ ref.nombre }}</div>
+              </div>
+            </div>
+            <!-- Botón para remover -->
+            <button
+              @click="nuevoComentario.referencias.splice(idx, 1)"
+              class="absolute top-1 right-1 bg-red-500 hover:bg-red-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs opacity-0 group-hover:opacity-100 transition"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
         <!-- Mensaje -->
         <textarea
           v-model="nuevoComentario.mensaje"
@@ -184,6 +229,29 @@
                 </div>
                 <p class="text-gray-300 text-sm break-words leading-relaxed">{{ comentario.mensaje }}</p>
                 
+                <!-- Referencias (fotos y proyectos) -->
+                <div v-if="comentario.referencias && comentario.referencias.length > 0" class="mt-3 grid grid-cols-3 gap-2">
+                  <div
+                    v-for="(ref, idx) in comentario.referencias"
+                    :key="idx"
+                    :title="ref.titulo"
+                    class="relative group"
+                  >
+                    <div class="bg-gray-700 rounded overflow-hidden h-20 flex items-center justify-center hover:opacity-80 transition cursor-pointer">
+                      <img
+                        v-if="ref.tipo === 'foto'"
+                        :src="ref.url"
+                        :alt="ref.titulo"
+                        class="w-full h-full object-cover"
+                      />
+                      <div v-else class="text-center text-xs px-2">
+                        <div class="font-semibold text-blue-400">📁</div>
+                        <div class="truncate text-gray-300">{{ ref.titulo }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <!-- Botón de like -->
                 <div class="mt-2 flex items-center gap-2">
                   <button
@@ -203,6 +271,64 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal Selector de Proyectos -->
+      <div v-if="mostrarSelectorProyectos" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto border border-gray-700">
+          <div class="sticky top-0 bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Selecciona un proyecto</h3>
+            <button
+              @click="mostrarSelectorProyectos = false"
+              class="text-2xl text-gray-400 hover:text-white transition"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="p-4 space-y-2">
+            <button
+              v-for="(proyecto, idx) in proyectos"
+              :key="idx"
+              @click="agregarReferenciaProyecto(proyecto)"
+              class="w-full text-left p-3 bg-gray-700 hover:bg-gray-600 rounded transition border border-gray-600 hover:border-gray-500"
+            >
+              <div class="font-semibold text-blue-400">#proyectos:{{ proyecto.id }}</div>
+              <div class="text-sm text-gray-300">{{ proyecto.titulo }}</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Selector de Fotos -->
+      <div v-if="mostrarSelectorFotos" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto border border-gray-700">
+          <div class="sticky top-0 bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Selecciona una foto</h3>
+            <button
+              @click="mostrarSelectorFotos = false"
+              class="text-2xl text-gray-400 hover:text-white transition"
+            >
+              ✕
+            </button>
+          </div>
+          <div class="p-4 grid grid-cols-2 gap-3">
+            <button
+              v-for="foto in fotosDisponibles"
+              :key="foto"
+              @click="agregarReferenciaFoto(foto)"
+              class="relative group overflow-hidden rounded border border-gray-600 hover:border-blue-500 transition"
+            >
+              <img
+                :src="`/Hackaton/${foto}`"
+                :alt="foto"
+                class="w-full h-24 object-cover group-hover:scale-110 transition"
+              />
+              <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="text-sm">{{ foto }}</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -215,7 +341,8 @@ export default {
       nuevoComentario: {
         nombre: '',
         icono: 'telecommuting.gif',
-        mensaje: ''
+        mensaje: '',
+        referencias: [] // Array de referencias { tipo, nombre, url }
       },
       enviando: false,
       puedeComentar: false,
@@ -237,7 +364,27 @@ export default {
       editando: null,
       misComentarios: {}, // { id: true/false }
       misLikes: {}, // { comentario_id: true/false }
-      toasts: [] // Para notificaciones
+      toasts: [], // Para notificaciones
+      mostrarSelectorProyectos: false,
+      mostrarSelectorFotos: false,
+      proyectos: [
+        {
+          id: 'sistema-monitoreo',
+          titulo: 'Sistema de Monitoreo de Activos',
+          imagen: '/image.png'
+        },
+        {
+          id: 'landing-page',
+          titulo: 'Landing Page',
+          imagen: '/moon.png'
+        },
+        {
+          id: 'videojuego',
+          titulo: 'Videojuego',
+          imagen: '/Videojuego.png'
+        }
+      ],
+      fotosDisponibles: [] // Se llenará dinámicamente
     };
   },
   mounted() {
@@ -249,6 +396,9 @@ export default {
       return;
     }
 
+    // Cargar fotos disponibles
+    this.cargarFotosDisponibles();
+
     // Cargar comentarios propios del localStorage
     this.cargarMisComentarios();
 
@@ -258,7 +408,7 @@ export default {
     // Verificar si puede comentar (si ya dio like)
     this.verificarSiPuedeComentar();
 
-    // Cargar comentarios
+    // Cargar comentariosm
     this.cargarComentarios();
 
     // Poll cada 3 segundos para actualizar comentarios en tiempo real
@@ -355,6 +505,22 @@ export default {
           if (Array.isArray(data)) {
             this.comentarios = data.filter(c => c.id && c.nombre && c.mensaje && c.creado_en);
             
+            // Procesar referencias en cada comentario
+            this.comentarios.forEach(comentario => {
+              // Si referencias es string (JSON de la BD), parsearlo
+              if (typeof comentario.referencias === 'string') {
+                try {
+                  comentario.referencias = JSON.parse(comentario.referencias);
+                } catch (e) {
+                  comentario.referencias = this.extraerReferenciasDelMensaje(comentario.mensaje);
+                }
+              }
+              // Si no hay referencias, intentar extraerlas del mensaje
+              if (!comentario.referencias || comentario.referencias.length === 0) {
+                comentario.referencias = this.extraerReferenciasDelMensaje(comentario.mensaje);
+              }
+            });
+            
             // Sincronizar likes desde el backend
             this.comentarios.forEach(comentario => {
               if (comentario.yaLike) {
@@ -398,6 +564,14 @@ export default {
 
       this.enviando = true;
 
+      // Construir el mensaje con las referencias
+      let mensajeConReferencias = this.nuevoComentario.mensaje;
+      const referencias = this.nuevoComentario.referencias.map(ref => ref.etiqueta);
+      
+      if (referencias.length > 0) {
+        mensajeConReferencias += '\n\n' + referencias.join(' ');
+      }
+
       fetch('/.netlify/functions/comentarios', {
         method: 'POST',
         headers: {
@@ -407,7 +581,8 @@ export default {
           dispositivo_id: this.dispositivo_id,
           nombre: this.nuevoComentario.nombre,
           icono: this.nuevoComentario.icono,
-          mensaje: this.nuevoComentario.mensaje
+          mensaje: mensajeConReferencias,
+          referencias: this.nuevoComentario.referencias // Enviar datos adicionales de referencias
         })
       })
         .then(res => {
@@ -432,7 +607,8 @@ export default {
           this.nuevoComentario = {
             nombre: '',
             icono: 'telecommuting.gif',
-            mensaje: ''
+            mensaje: '',
+            referencias: []
           };
           // Mostrar mensaje de éxito
           this.showToast('✅ Comentario enviado. Será visible cuando lo apruebe.', 'success');
@@ -683,6 +859,99 @@ export default {
         .finally(() => {
           this.enviando = false;
         });
+    },
+    extraerReferenciasDelMensaje(mensaje) {
+      // Buscar referencias en formato: #proyectos:nombre-proyecto o #file:nombre-archivo
+      const referencias = [];
+      
+      // Patrón para proyectos: #proyectos:sistema-monitoreo
+      const proyectoPattern = /#proyectos:([a-zA-Z0-9\-_]+)/g;
+      let match;
+      
+      while ((match = proyectoPattern.exec(mensaje)) !== null) {
+        const proyectoId = match[1];
+        const proyecto = this.proyectos.find(p => p.id === proyectoId);
+        
+        if (proyecto) {
+          referencias.push({
+            tipo: 'proyecto',
+            nombre: proyecto.id,
+            etiqueta: match[0],
+            url: proyecto.imagen,
+            titulo: proyecto.titulo
+          });
+        }
+      }
+      
+      // Patrón para archivos: #file:grupo.png
+      const filePattern = /#file:([a-zA-Z0-9\-_.]+)/g;
+      while ((match = filePattern.exec(mensaje)) !== null) {
+        const nombreArchivo = match[1];
+        
+        referencias.push({
+          tipo: 'foto',
+          nombre: nombreArchivo,
+          etiqueta: match[0],
+          url: `/Hackaton/${nombreArchivo}`,
+          titulo: nombreArchivo
+        });
+      }
+      
+      return referencias;
+    },
+    agregarReferenciaProyecto(proyecto) {
+      // Verificar si ya existe esta referencia
+      const yaExiste = this.nuevoComentario.referencias.some(
+        r => r.tipo === 'proyecto' && r.nombre === proyecto.id
+      );
+      
+      if (yaExiste) {
+        this.showToast('⚠️ Este proyecto ya está agregado', 'info');
+        this.mostrarSelectorProyectos = false;
+        return;
+      }
+      
+      this.nuevoComentario.referencias.push({
+        tipo: 'proyecto',
+        nombre: proyecto.id,
+        etiqueta: `#proyectos:${proyecto.id}`,
+        url: proyecto.imagen,
+        titulo: proyecto.titulo
+      });
+      
+      this.mostrarSelectorProyectos = false;
+      this.showToast(`✅ Proyecto "${proyecto.titulo}" agregado`, 'success');
+    },
+    agregarReferenciaFoto(nombreFoto) {
+      // Verificar si ya existe esta referencia
+      const yaExiste = this.nuevoComentario.referencias.some(
+        r => r.tipo === 'foto' && r.nombre === nombreFoto
+      );
+      
+      if (yaExiste) {
+        this.showToast('⚠️ Esta foto ya está agregada', 'info');
+        this.mostrarSelectorFotos = false;
+        return;
+      }
+      
+      this.nuevoComentario.referencias.push({
+        tipo: 'foto',
+        nombre: nombreFoto,
+        etiqueta: `#file:${nombreFoto}`,
+        url: `/Hackaton/${nombreFoto}`,
+        titulo: nombreFoto
+      });
+      
+      this.mostrarSelectorFotos = false;
+      this.showToast(`✅ Foto "${nombreFoto}" agregada`, 'success');
+    },
+    cargarFotosDisponibles() {
+      // Lista de fotos disponibles en /public/Hackaton/
+      this.fotosDisponibles = [
+        'ganadores.jpg',
+        'grupo.png',
+        'hackaton.jpg'
+      ];
     },
     showToast(mensaje, tipo = 'info', duracion = 2000) {
       const id = Date.now();

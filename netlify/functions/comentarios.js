@@ -35,7 +35,7 @@ exports.handler = async (event) => {
       const dispositivo_id = event.queryStringParameters?.dispositivo_id;
       
       // Si viene con dispositivo_id, retorna aprobados + sus pendientes
-      let query = 'SELECT id, nombre, icono, mensaje, creado_en, aprobado, dispositivo_id, likes FROM comentarios WHERE aprobado = true';
+      let query = 'SELECT id, nombre, icono, mensaje, referencias, creado_en, aprobado, dispositivo_id, likes FROM comentarios WHERE aprobado = true';
       let params = [];
       
       if (dispositivo_id) {
@@ -145,9 +145,13 @@ exports.handler = async (event) => {
         };
       }
 
+      // Procesar referencias (vienen en el body)
+      const { referencias } = body;
+      const referenciasJSON = referencias ? JSON.stringify(referencias) : '[]';
+
       const result = await client.query(
-        'INSERT INTO comentarios (dispositivo_id, nombre, icono, mensaje, aprobado) VALUES ($1, $2, $3, $4, false) RETURNING id',
-        [dispositivo_id, nombre, icono, mensaje]
+        'INSERT INTO comentarios (dispositivo_id, nombre, icono, mensaje, referencias, aprobado) VALUES ($1, $2, $3, $4, $5, false) RETURNING id',
+        [dispositivo_id, nombre, icono, mensaje, referenciasJSON]
       );
 
       return {
