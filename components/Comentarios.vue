@@ -284,7 +284,10 @@
               <img
                 :src="proyecto.imagen"
                 :alt="proyecto.titulo"
-                class="w-full h-24 object-cover group-hover:scale-110 transition"
+                :class="[
+                  'w-full h-24 object-cover group-hover:scale-110 transition',
+                  proyecto.id === 'videojuego' ? 'object-bottom' : 'object-center'
+                ]"
               />
               <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                 <span class="text-sm text-center px-2">{{ proyecto.titulo }}</span>
