@@ -263,9 +263,18 @@ export default {
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
     window.addEventListener('likeGiven', () => {
-      // Actualizar inmediatamente sin espera
-      this.cargarComentarios();
-      this.verificarSiPuedeComentar();
+      // Pequeño delay para asegurar que el localStorage se actualizó
+      setTimeout(async () => {
+        await new Promise(resolve => {
+          // Cargar comentarios primero
+          this.cargarComentarios();
+          // Luego chequear si puede comentar
+          setTimeout(() => {
+            this.verificarSiPuedeComentar();
+            resolve();
+          }, 50);
+        });
+      }, 50);
     });
   },
   computed: {
