@@ -416,11 +416,11 @@ export default {
     // Cargar comentariosm
     this.cargarComentarios();
 
-    // Poll cada 3 segundos para actualizar comentarios en tiempo real
+    // Poll cada 5 segundos para actualizar comentarios en tiempo real (reducido para evitar sobrecarga)
     setInterval(async () => {
       await this.cargarComentarios();
       this.verificarSiPuedeComentar();
-    }, 3000);
+    }, 5000);
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
     window.addEventListener('likeGiven', async () => {
@@ -549,13 +549,8 @@ export default {
             });
             this.guardarMisComentarios();
             
-            // Si no hay comentarios del usuario, limpiar el bloqueo de 24hrs
-            const tieneComentariosAprobados = this.comentarios.some(c => c.aprobado === true && this.misComentarios[c.id]);
-            if (!tieneComentariosAprobados) {
-              const ultimoComentarioKey = `portafolioUltimoComentario_${this.dispositivo_id}`;
-              localStorage.removeItem(ultimoComentarioKey);
-              this.proximoComentarioEn = null;
-            }
+            // Después de cargar, verificar si puede comentar
+            this.verificarSiPuedeComentar();
             
             return data;
           }
