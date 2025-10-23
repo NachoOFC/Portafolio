@@ -257,8 +257,9 @@ export default {
     this.cargarComentarios();
 
     // Poll cada 3 segundos para actualizar comentarios en tiempo real
-    setInterval(() => {
-      this.cargarComentarios();
+    setInterval(async () => {
+      await this.cargarComentarios();
+      this.verificarSiPuedeComentar();
     }, 3000);
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
@@ -379,9 +380,6 @@ export default {
               localStorage.removeItem(ultimoComentarioKey);
               this.proximoComentarioEn = null;
             }
-            
-            // Verificar si puede comentar
-            this.verificarSiPuedeComentar();
             
             return data;
           }
