@@ -150,14 +150,13 @@ export default {
       this.enviarVisitaAlServidor();
     }
 
-    // Cargar TOP 1 comentario
-    this.cargarComentarioTop1();
+    // Cargar contadores y TOP 1 comentario UNA SOLA VEZ al inicio
+    this.obtenerContadoresDelServidor();
 
-    // Poll cada 2 segundos para actualizar contadores en tiempo real
+    // Poll cada 3 segundos para actualizar contadores en tiempo real (solo UNA llamada)
     setInterval(() => {
       this.obtenerContadoresDelServidor();
-      this.cargarComentarioTop1();
-    }, 2000);
+    }, 3000);
 
     // Rotar moneda cada 3 segundos
     this.intervaloMoneda = setInterval(() => {
@@ -292,12 +291,19 @@ export default {
       })
       .catch(() => {});
 
-      // Obtener número de comentarios aprobados
+      // Obtener número de comentarios aprobados + TOP 1
       fetch('/.netlify/functions/comentarios')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          this.comentarios = data.filter(c => c.aprobado === true).length;
+          const comentariosAprobados = data.filter(c => c.aprobado === true);
+          this.comentarios = comentariosAprobados.length;
+          
+          // Obtener el TOP 1 (ordenado por likes)
+          if (comentariosAprobados.length > 0) {
+            const ordenados = comentariosAprobados.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+            this.comentarioTop1 = ordenados[0];
+          }
         }
       })
       .catch(() => {});
@@ -316,19 +322,6 @@ export default {
         return (num / 1000).toFixed(1) + 'K';
       }
       return num;
-    },
-    cargarComentarioTop1() {
-      // Obtener todos los comentarios aprobados
-      fetch('/.netlify/functions/comentarios')
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data) && data.length > 0) {
-            // Ordenar por likes descendente
-            const ordenados = data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-            this.comentarioTop1 = ordenados[0] || null;
-          }
-        })
-        .catch(() => {});
     }
   }
 }
