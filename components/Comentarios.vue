@@ -369,12 +369,12 @@ export default {
       mostrarSelectorFotos: false,
       proyectos: [
         {
-          id: 'sistema-monitoreo',
+          id: 'smtr',
           titulo: 'Sistema de Monitoreo de Activos',
           imagen: '/image.png'
         },
         {
-          id: 'landing-page',
+          id: 'landing',
           titulo: 'Landing Page',
           imagen: '/moon.png'
         },
