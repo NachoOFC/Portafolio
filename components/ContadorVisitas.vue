@@ -28,11 +28,27 @@
     </div>
 
     <!-- Botón de comentarios -->
-    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 p-4 flex flex-col items-center justify-center w-16 h-16 cursor-pointer group relative"
+    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-110 p-4 flex flex-col items-center justify-center w-16 h-16 cursor-pointer group relative perspective"
       @click="irAComentarios"
       :title="`${comentarios} comentarios`">
-      <i class="fas fa-comments text-xl mb-1"></i>
-      <span class="text-xs font-bold">{{ formatearNumero(comentarios) }}</span>
+      <!-- Moneda giratoria -->
+      <div class="absolute inset-0 rounded-full flex items-center justify-center">
+        <!-- Lado 1: Icono del TOP 1 comentario -->
+        <img
+          v-if="mostrarIconoTop1 && comentarioTop1"
+          :src="`/comentarios/${comentarioTop1.icono}`"
+          :alt="comentarioTop1.nombre"
+          class="w-12 h-12 rounded-full object-contain transition-all duration-500"
+          :style="{ opacity: mostrarIconoTop1 ? 1 : 0 }"
+        />
+        <!-- Lado 2: Número de comentarios -->
+        <div v-if="!mostrarIconoTop1"
+          class="flex flex-col items-center justify-center transition-all duration-500"
+          :style="{ opacity: !mostrarIconoTop1 ? 1 : 0 }">
+          <i class="fas fa-comments text-xl mb-1"></i>
+          <span class="text-xs font-bold">{{ formatearNumero(comentarios) }}</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -65,11 +81,27 @@
     </div>
 
     <!-- Botón de comentarios móvil -->
-    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-full shadow-lg transition-all duration-300 p-2 flex flex-col items-center justify-center w-12 h-12 cursor-pointer relative"
+    <div class="bg-gradient-to-br from-green-500 to-green-700 text-white rounded-full shadow-lg transition-all duration-300 p-2 flex flex-col items-center justify-center w-12 h-12 cursor-pointer relative perspective"
       @click="irAComentarios"
       :title="`${comentarios} comentarios`">
-      <i class="fas fa-comments text-sm mb-0.5"></i>
-      <span class="text-xs font-bold">{{ formatearNumero(comentarios) }}</span>
+      <!-- Moneda giratoria móvil -->
+      <div class="absolute inset-0 rounded-full flex items-center justify-center">
+        <!-- Lado 1: Icono del TOP 1 comentario -->
+        <img
+          v-if="mostrarIconoTop1 && comentarioTop1"
+          :src="`/comentarios/${comentarioTop1.icono}`"
+          :alt="comentarioTop1.nombre"
+          class="w-10 h-10 rounded-full object-contain transition-all duration-500"
+          :style="{ opacity: mostrarIconoTop1 ? 1 : 0 }"
+        />
+        <!-- Lado 2: Número de comentarios -->
+        <div v-if="!mostrarIconoTop1"
+          class="flex flex-col items-center justify-center transition-all duration-500"
+          :style="{ opacity: !mostrarIconoTop1 ? 1 : 0 }">
+          <i class="fas fa-comments text-sm mb-0.5"></i>
+          <span class="text-xs font-bold">{{ formatearNumero(comentarios) }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -84,7 +116,10 @@ export default {
       mostrarVisitas: false,
       likeReciente: false,
       yaLike: false,
-      deviceId: null
+      deviceId: null,
+      mostrarIconoTop1: false,
+      comentarioTop1: null,
+      intervaloMoneda: null
     }
   },
   mounted() {
@@ -115,10 +150,19 @@ export default {
       this.enviarVisitaAlServidor();
     }
 
+    // Cargar TOP 1 comentario
+    this.cargarComentarioTop1();
+
     // Poll cada 2 segundos para actualizar contadores en tiempo real
     setInterval(() => {
       this.obtenerContadoresDelServidor();
+      this.cargarComentarioTop1();
     }, 2000);
+
+    // Rotar moneda cada 3 segundos
+    this.intervaloMoneda = setInterval(() => {
+      this.mostrarIconoTop1 = !this.mostrarIconoTop1;
+    }, 3000);
 
     // Google Analytics: registrar vista de página
     if (window.gtag) {
@@ -126,6 +170,11 @@ export default {
         page_title: document.title,
         page_location: window.location.href
       });
+    }
+  },
+  beforeUnmount() {
+    if (this.intervaloMoneda) {
+      clearInterval(this.intervaloMoneda);
     }
   },
   methods: {
@@ -267,12 +316,29 @@ export default {
         return (num / 1000).toFixed(1) + 'K';
       }
       return num;
+    },
+    cargarComentarioTop1() {
+      // Obtener todos los comentarios aprobados
+      fetch('/.netlify/functions/comentarios')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            // Ordenar por likes descendente
+            const ordenados = data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+            this.comentarioTop1 = ordenados[0] || null;
+          }
+        })
+        .catch(() => {});
     }
   }
 }
 </script>
 
 <style scoped>
+.perspective {
+  perspective: 1000px;
+}
+
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);
