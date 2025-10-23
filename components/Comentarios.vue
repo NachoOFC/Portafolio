@@ -84,7 +84,10 @@
               <img
                 :src="ref.url"
                 :alt="ref.nombre"
-                class="w-full h-full object-cover"
+                :class="[
+                  'w-full h-full object-cover',
+                  ref.tipo === 'proyecto' && ref.nombre === 'videojuego' ? 'object-bottom' : 'object-center'
+                ]"
               />
             </div>
             <!-- Botón para remover -->
@@ -236,7 +239,10 @@
                       <img
                         :src="ref.url"
                         :alt="ref.titulo"
-                        class="w-full h-full object-cover"
+                        :class="[
+                          'w-full h-full object-cover',
+                          ref.tipo === 'proyecto' && ref.nombre === 'videojuego' ? 'object-bottom' : 'object-center'
+                        ]"
                       />
                     </div>
                   </div>
