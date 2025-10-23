@@ -43,7 +43,7 @@ exports.handler = async (event) => {
         params = [dispositivo_id];
       }
       
-      query += ' ORDER BY likes DESC, creado_en DESC';
+      query += ' ORDER BY likes DESC, creado_en ASC';
       
       const result = await client.query(query, params);
 
