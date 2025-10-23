@@ -517,6 +517,11 @@ export default {
       }
     },
     darLikeComentario(id) {
+      if (!this.dispositivo_id) {
+        this.showToast('❌ Error: dispositivo no identificado', 'error');
+        return;
+      }
+
       fetch('/.netlify/functions/comentarios', {
         method: 'POST',
         headers: {
@@ -524,11 +529,16 @@ export default {
         },
         body: JSON.stringify({
           action: 'like',
-          comentario_id: id,
+          id: id,
           dispositivo_id: this.dispositivo_id
         })
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
           // Actualizar estado local
           this.misLikes[id] = true;
@@ -549,11 +559,16 @@ export default {
           });
         })
         .catch(err => {
-          console.error('Error:', err);
+          console.error('Error en darLikeComentario:', err);
           this.showToast('❌ Error al dar like', 'error');
         });
     },
     quitarLikeComentario(id) {
+      if (!this.dispositivo_id) {
+        this.showToast('❌ Error: dispositivo no identificado', 'error');
+        return;
+      }
+
       fetch('/.netlify/functions/comentarios', {
         method: 'DELETE',
         headers: {
@@ -565,7 +580,12 @@ export default {
           dispositivo_id: this.dispositivo_id
         })
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
           // Actualizar estado local
           delete this.misLikes[id];
@@ -586,7 +606,7 @@ export default {
           });
         })
         .catch(err => {
-          console.error('Error:', err);
+          console.error('Error en quitarLikeComentario:', err);
           this.showToast('❌ Error al quitar like', 'error');
         });
     },

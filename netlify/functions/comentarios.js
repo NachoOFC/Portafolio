@@ -72,14 +72,17 @@ exports.handler = async (event) => {
     // POST - crear comentario O dar like a comentario
     if (method === 'POST') {
       const body = JSON.parse(event.body);
-      const { dispositivo_id, nombre, icono, mensaje, comentario_id, action } = body;
+      const { dispositivo_id, nombre, icono, mensaje, comentario_id, id, action } = body;
+      
+      // Usar comentario_id o id indistintamente (para compatibilidad)
+      const likeId = comentario_id || id;
 
       // ACCIÓN: DAR LIKE A UN COMENTARIO
-      if (action === 'like' && comentario_id && dispositivo_id) {
+      if (action === 'like' && likeId && dispositivo_id) {
         // Verificar si ya dio like
         const yaLike = await client.query(
           'SELECT id FROM comentarios_likes WHERE comentario_id = $1 AND dispositivo_id = $2',
-          [comentario_id, dispositivo_id]
+          [likeId, dispositivo_id]
         );
 
         if (yaLike.rows.length > 0) {
@@ -93,19 +96,19 @@ exports.handler = async (event) => {
         // Insertar like
         await client.query(
           'INSERT INTO comentarios_likes (comentario_id, dispositivo_id) VALUES ($1, $2)',
-          [comentario_id, dispositivo_id]
+          [likeId, dispositivo_id]
         );
 
         // Incrementar contador de likes en comentarios
         await client.query(
           'UPDATE comentarios SET likes = likes + 1 WHERE id = $1',
-          [comentario_id]
+          [likeId]
         );
 
         // Obtener nuevo contador
         const resultado = await client.query(
           'SELECT likes FROM comentarios WHERE id = $1',
-          [comentario_id]
+          [likeId]
         );
 
         return {
