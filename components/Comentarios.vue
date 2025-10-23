@@ -82,15 +82,10 @@
           >
             <div class="bg-gray-700 rounded overflow-hidden h-24 flex items-center justify-center">
               <img
-                v-if="ref.tipo === 'foto'"
                 :src="ref.url"
                 :alt="ref.nombre"
                 class="w-full h-full object-cover"
               />
-              <div v-else class="text-center text-xs px-2">
-                <div class="font-semibold text-blue-400">📁</div>
-                <div class="truncate">{{ ref.nombre }}</div>
-              </div>
             </div>
             <!-- Botón para remover -->
             <button
@@ -239,15 +234,10 @@
                   >
                     <div class="bg-gray-700 rounded overflow-hidden h-20 flex items-center justify-center hover:opacity-80 transition cursor-pointer">
                       <img
-                        v-if="ref.tipo === 'foto'"
                         :src="ref.url"
                         :alt="ref.titulo"
                         class="w-full h-full object-cover"
                       />
-                      <div v-else class="text-center text-xs px-2">
-                        <div class="font-semibold text-blue-400">📁</div>
-                        <div class="truncate text-gray-300">{{ ref.titulo }}</div>
-                      </div>
                     </div>
                   </div>
                 </div>
