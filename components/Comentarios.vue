@@ -495,7 +495,7 @@ export default {
             if (b.likes !== a.likes) {
               return b.likes - a.likes;
             }
-            return new Date(b.creado_en) - new Date(a.creado_en);
+            return new Date(a.creado_en) - new Date(b.creado_en);
           });
         })
         .catch(err => {
@@ -532,7 +532,7 @@ export default {
             if (b.likes !== a.likes) {
               return b.likes - a.likes;
             }
-            return new Date(b.creado_en) - new Date(a.creado_en);
+            return new Date(a.creado_en) - new Date(b.creado_en);
           });
         })
         .catch(err => {
