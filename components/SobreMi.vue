@@ -9,7 +9,6 @@
           alt="Nacho Animado" 
           class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg transition-opacity duration-500"
           :style="{ opacity: mostrarFotoAnimada ? 1 : 0 }"
-          loading="lazy"
         />
         <img 
           v-if="!mostrarFotoAnimada" 
@@ -17,7 +16,6 @@
           alt="Ignacio" 
           class="w-32 h-32 object-cover rounded-full border-4 border-gradient shadow-lg transition-opacity duration-500"
           :style="{ opacity: !mostrarFotoAnimada ? 1 : 0 }"
-          loading="lazy"
         />
       </div>
       <div class="flex flex-row items-center justify-center gap-4 mb-4">
