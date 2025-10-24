@@ -416,11 +416,11 @@ export default {
     // Cargar comentariosm
     this.cargarComentarios();
 
-    // Poll cada 5 segundos para actualizar comentarios en tiempo real (reducido para evitar sobrecarga)
+    // Poll cada 60 segundos para actualizar comentarios en tiempo real
     setInterval(async () => {
       await this.cargarComentarios();
       this.verificarSiPuedeComentar();
-    }, 5000);
+    }, 60000);
 
     // Escuchar evento cuando se da like (desde ContadorVisitas)
     window.addEventListener('likeGiven', async () => {

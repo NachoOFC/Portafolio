@@ -153,10 +153,10 @@ export default {
     // Cargar contadores y TOP 1 comentario UNA SOLA VEZ al inicio
     this.obtenerContadoresDelServidor();
 
-    // Poll cada 5 segundos para actualizar contadores en tiempo real (reducido para evitar sobrecarga)
+    // Poll cada 60 segundos para actualizar contadores en tiempo real
     setInterval(() => {
       this.obtenerContadoresDelServidor();
-    }, 5000);
+    }, 60000);
 
     // Rotar moneda cada 3 segundos
     this.intervaloMoneda = setInterval(() => {

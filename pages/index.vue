@@ -16,7 +16,7 @@
   <section id="certificados" class="py-12 bg-gray-900 text-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-2xl sm:text-3xl font-bold text-gradient text-center mb-8">Certificados</h2>
-      <div class="relative px-2 sm:px-0" style="min-height: 420px; padding-bottom: 40px;">
+      <div class="relative px-2 sm:px-0" style="min-height: 420px; padding-bottom: 40px;" v-if="mostrarCertificados">
         <swiper 
           :modules="modules"
           :slides-per-view="1" 
@@ -42,7 +42,8 @@
               <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer"
                 @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
                 <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre"
-                  class="object-contain rounded-lg shadow max-h-48 max-w-full px-2 transition-transform duration-300 group-hover:scale-110" />
+                  class="object-contain rounded-lg shadow max-h-48 max-w-full px-2 transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy" />
                 <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg"
                   class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -60,6 +61,11 @@
         </swiper>
         <div class="swiper-button-prev custom-swiper-arrow"></div>
         <div class="swiper-button-next custom-swiper-arrow"></div>
+      </div>
+      <div v-else class="text-center py-8">
+        <button @click="cargarCertificados" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full font-semibold transition">
+          📜 Ver mis certificados
+        </button>
       </div>
       <!-- Modal para ver imagen grande -->
       <div v-if="modalAbierto" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"
@@ -122,6 +128,7 @@ export default {
   data() {
     return {
       modules: [Navigation, Pagination],
+      mostrarCertificados: false,
       certificados: [
         { nombre: 'Cuenta historias con los datos', file: 'CertificadoDeFinalizacion_Aprende data science Cuenta historias con los datos (1).pdf', url: '/Certificados/CertificadoDeFinalizacion_Aprende%20data%20science%20Cuenta%20historias%20con%20los%20datos%20(1).pdf', imagen: '/Certificados/aprendedatascience-CuentaHistorias.png' },
         { nombre: 'Certificado Microsoft', file: 'CertificadoMicrosoft.pdf', url: '/Certificados/CertificadoMicrosoft.pdf', imagen: '/Certificados/microsoft.png', destacado: true },
@@ -155,6 +162,10 @@ export default {
     AOS.init({ duration: 800, once: true });
   },
   methods: {
+    cargarCertificados() {
+      this.mostrarCertificados = true;
+      AOS.init({ duration: 800, once: true });
+    },
     abrirModal(imagen, titulo) {
       if (imagen) {
         this.modalImagen = imagen;
