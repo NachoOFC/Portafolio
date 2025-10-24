@@ -11,6 +11,32 @@ export default defineNuxtConfig({
   ],
   app: {
     head: {
+      meta: [
+        {
+          name: 'og:title',
+          content: 'Nacho - Desarrollador Full Stack',
+        },
+        {
+          name: 'og:description',
+          content: 'Portfolio profesional de Ignacio. Desarrollador Full Stack con experiencia en web development, proyectos innovadores y más.',
+        },
+        {
+          name: 'og:image',
+          content: 'https://nachoportafolio.me/nachoanimado.png',
+        },
+        {
+          name: 'og:url',
+          content: 'https://nachoportafolio.me',
+        },
+        {
+          name: 'og:type',
+          content: 'website',
+        },
+        {
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+      ],
       script: [
         {
           async: true,
