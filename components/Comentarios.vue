@@ -63,13 +63,13 @@
             @click="mostrarSelectorProyectos = true"
             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-semibold transition flex items-center gap-2"
           >
-            📁 Agregar Proyecto
+            📁 Comentar Proyecto
           </button>
           <button
             @click="mostrarSelectorFotos = true"
             class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-semibold transition flex items-center gap-2"
           >
-            🖼️ Agregar Foto
+            🖼️ Comentar Foto
           </button>
         </div>
 
@@ -130,9 +130,6 @@
           </div>
           <div v-else-if="comentarios.some(c => misComentarios[c.id] && c.aprobado === false)">
             ✏️ Termina o borra tu comentario pendiente para hacer uno nuevo
-          </div>
-          <div v-else>
-            💛 Primero debes dar like para comentar
           </div>
         </div>
       </div>
@@ -421,18 +418,6 @@ export default {
       await this.cargarComentarios();
       this.verificarSiPuedeComentar();
     }, 5000);
-
-    // Escuchar evento cuando se da like (desde ContadorVisitas)
-    window.addEventListener('likeGiven', async () => {
-      // Pequeño delay para asegurar que el localStorage se actualizó
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      // Cargar comentarios y esperar a que termine
-      await this.cargarComentarios();
-      
-      // Luego chequear si puede comentar
-      this.verificarSiPuedeComentar();
-    });
   },
   computed: {
     comentariosAprobados() {
@@ -444,21 +429,18 @@ export default {
   },
   methods: {
     verificarSiPuedeComentar() {
-      const ultimoLikeKey = `portafolioUltimoLike_${this.dispositivo_id}`;
-      const ultimoLike = localStorage.getItem(ultimoLikeKey);
-      this.puedeComentar = !!ultimoLike; // True si existe el timestamp
+      // Por defecto puede comentar
+      this.puedeComentar = true;
 
       // VERIFICAR: ¿Tiene algún comentario pendiente (sin aprobar)?
-      if (this.puedeComentar) {
-        const tieneComentarioPendiente = this.comentarios.some(c => 
-          this.misComentarios[c.id] && c.aprobado === false
-        );
-        
-        if (tieneComentarioPendiente) {
-          this.puedeComentar = false;
-          this.proximoComentarioEn = null;
-          return; // Exit, no puede comentar
-        }
+      const tieneComentarioPendiente = this.comentarios.some(c => 
+        this.misComentarios[c.id] && c.aprobado === false
+      );
+      
+      if (tieneComentarioPendiente) {
+        this.puedeComentar = false;
+        this.proximoComentarioEn = null;
+        return; // Exit, no puede comentar
       }
 
       // Verificar límite de 1 comentario por 24hrs (SOLO si fue aprobado)

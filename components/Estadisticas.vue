@@ -1,5 +1,5 @@
 <template>
-  <section class="py-16 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white relative overflow-hidden">
+  <section class="py-16 bg-gray-900 text-white relative overflow-hidden">
     <!-- Efectos de fondo -->
     <div class="absolute inset-0 opacity-10">
       <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl animate-pulse"></div>
@@ -77,73 +77,74 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
+
 export default {
-  data() {
-    return {
-      animatedExperience: 0,
-      animatedProjects: 0,
-      animatedTech: 0,
-      animatedCertificates: 0,
-      targetExperience: 2, // 2023 a 2025
-      targetProjects: 5,
-      targetTech: 15, // Basado en tus iconos de tecnología
-      targetCertificates: 13, // Basado en tu array de certificados
-      hasAnimated: false
+  setup() {
+    const animatedExperience = ref(0)
+    const animatedProjects = ref(0)
+    const animatedTech = ref(0)
+    const animatedCertificates = ref(0)
+    const targetExperience = 2
+    const targetProjects = 5
+    const targetTech = 15
+    const targetCertificates = 13
+    let hasAnimated = false
+
+    const animateCounters = () => {
+      const duration = 2000
+      const frameDuration = 1000 / 60
+      const totalFrames = Math.round(duration / frameDuration)
+
+      animateCounter(animatedExperience, targetExperience, totalFrames, 0)
+      setTimeout(() => {
+        animateCounter(animatedProjects, targetProjects, totalFrames, 0)
+      }, 100)
+      setTimeout(() => {
+        animateCounter(animatedTech, targetTech, totalFrames, 0)
+      }, 200)
+      setTimeout(() => {
+        animateCounter(animatedCertificates, targetCertificates, totalFrames, 0)
+      }, 300)
     }
-  },
-  mounted() {
-    // Configurar el Intersection Observer para animar cuando sea visible
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !this.hasAnimated) {
-            this.hasAnimated = true;
-            this.animateCounters();
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
 
-    observer.observe(this.$el);
-  },
-  methods: {
-    animateCounters() {
-      const duration = 2000; // 2 segundos
-      const frameDuration = 1000 / 60; // 60 FPS
-      const totalFrames = Math.round(duration / frameDuration);
-
-      // Animar experiencia
-      this.animateCounter('animatedExperience', this.targetExperience, totalFrames, 0);
-      
-      // Animar proyectos (con delay)
-      setTimeout(() => {
-        this.animateCounter('animatedProjects', this.targetProjects, totalFrames, 0);
-      }, 100);
-      
-      // Animar tecnologías (con delay)
-      setTimeout(() => {
-        this.animateCounter('animatedTech', this.targetTech, totalFrames, 0);
-      }, 200);
-      
-      // Animar certificaciones (con delay)
-      setTimeout(() => {
-        this.animateCounter('animatedCertificates', this.targetCertificates, totalFrames, 0);
-      }, 300);
-    },
-    animateCounter(property, target, totalFrames, currentFrame) {
+    const animateCounter = (property, target, totalFrames, currentFrame) => {
       if (currentFrame <= totalFrames) {
-        const progress = currentFrame / totalFrames;
-        // Función de easing para una animación más suave
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        this[property] = Math.round(easeOutQuart * target);
+        const progress = currentFrame / totalFrames
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+        property.value = Math.round(easeOutQuart * target)
         
         requestAnimationFrame(() => {
-          this.animateCounter(property, target, totalFrames, currentFrame + 1);
-        });
+          animateCounter(property, target, totalFrames, currentFrame + 1)
+        })
       } else {
-        this[property] = target;
+        property.value = target
       }
+    }
+
+    onMounted(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !hasAnimated) {
+              hasAnimated = true
+              animateCounters()
+            }
+          })
+        },
+        { threshold: 0.3 }
+      )
+
+      if (document.querySelector('section')) {
+        observer.observe(document.querySelector('section'))
+      }
+    })
+
+    return {
+      animatedExperience,
+      animatedProjects,
+      animatedTech,
+      animatedCertificates
     }
   }
 }

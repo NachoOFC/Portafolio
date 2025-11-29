@@ -126,9 +126,6 @@ export default {
     // Obtener ID único del dispositivo
     this.obtenerDeviceId();
 
-    // Verificar si ya dio like en las últimas 24 horas
-    this.verificarSiYaLike();
-
     // Obtener contadores globales del servidor
     this.obtenerContadoresDelServidor();
 
@@ -189,32 +186,9 @@ export default {
       
       this.deviceId = deviceId;
     },
-    verificarSiYaLike() {
-      // Obtener timestamp del último like de este dispositivo
-      const ultimoLikeKey = `portafolioUltimoLike_${this.deviceId}`;
-      const ultimoLikeGuardado = localStorage.getItem(ultimoLikeKey);
-      
-      if (ultimoLikeGuardado) {
-        const ultimoLike = new Date(ultimoLikeGuardado);
-        const ahora = new Date();
-        const diferenciaMilisegundos = ahora - ultimoLike;
-        const ochoHoras = 8 * 60 * 60 * 1000; // 8 horas en ms
-        
-        // Si pasaron menos de 8 horas, bloquear
-        if (diferenciaMilisegundos < ochoHoras) {
-          this.yaLike = true;
-          console.log(`Ya diste like. Vuelve en ${Math.ceil((ochoHoras - diferenciaMilisegundos) / 1000 / 60)} minutos.`);
-          return;
-        }
-      }
-      
-      // Si pasaron más de 8 horas o nunca dio like, permitir
-      this.yaLike = false;
-    },
     agregarLike() {
       // Si ya dio like en las últimas 8 horas, no permitir
       if (this.yaLike) {
-        console.log('Ya diste like hace menos de 8 horas.');
         return;
       }
 
@@ -222,16 +196,6 @@ export default {
       this.yaLike = true;
       this.likeReciente = true;
       
-      // Guardar timestamp del like con clave única por dispositivo
-      const ultimoLikeKey = `portafolioUltimoLike_${this.deviceId}`;
-      localStorage.setItem(ultimoLikeKey, new Date().toISOString());
-
-      // Emitir evento global para Comentarios (actualizar sin recargar)
-      window.dispatchEvent(new Event('likeGiven'));
-
-      // Enviar like al servidor
-      this.enviarLikeAlServidor();
-
       // Animación
       setTimeout(() => {
         this.likeReciente = false;

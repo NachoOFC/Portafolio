@@ -3,6 +3,7 @@
     <NuxtPage />
     <VolverArriba />
     <ContadorVisitas />
+    <SelectorTema />
   </div>
 </template>
 
@@ -11,8 +12,14 @@ import { onMounted } from 'vue'
 import AOS from 'aos'
 import VolverArriba from '@/components/VolverArriba.vue'
 import ContadorVisitas from '@/components/ContadorVisitas.vue'
+import SelectorTema from '@/components/SelectorTema.vue'
+import { useTheme } from '@/composables/useTheme'
+
+const { initTheme } = useTheme()
 
 onMounted(() => {
+  initTheme()
+  
   AOS.init({
     once: true,
     duration: 800,
