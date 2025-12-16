@@ -16,8 +16,33 @@
   <section id="certificados" class="py-12 bg-gray-900 text-white">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-2xl sm:text-3xl font-bold text-gradient text-center mb-8">Certificados</h2>
+
+      <div class="flex justify-center mb-6">
+        <div class="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 p-1 shadow">
+          <button
+            type="button"
+            @click="categoriaCertificados = 'normales'"
+            :aria-pressed="categoriaCertificados === 'normales'"
+            class="px-4 py-2 text-sm font-bold rounded-full transition"
+            :class="categoriaCertificados === 'normales' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'"
+          >
+            Certificados
+          </button>
+          <button
+            type="button"
+            @click="categoriaCertificados = 'academicos'"
+            :aria-pressed="categoriaCertificados === 'academicos'"
+            class="px-4 py-2 text-sm font-bold rounded-full transition"
+            :class="categoriaCertificados === 'academicos' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700'"
+          >
+            Académicos
+          </button>
+        </div>
+      </div>
+
       <div class="relative px-2 sm:px-0" style="min-height: 420px; padding-bottom: 40px;">
         <swiper 
+          :key="categoriaCertificados"
           :modules="modules"
           :slides-per-view="1" 
           :space-between="20" 
@@ -32,7 +57,7 @@
           }"
           class="mySwiper"
           style="width:100%; min-height: 420px;">
-          <swiper-slide v-for="cert in certificados" :key="cert.file" class="h-full flex items-stretch justify-center">
+          <swiper-slide v-for="cert in certificadosActivos" :key="cert.file" class="h-full flex items-stretch justify-center">
             <div :class="[
               'bg-gray-800 bg-opacity-90 rounded-2xl shadow-lg flex flex-col items-center border border-gray-700 overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl w-full max-w-xs mx-auto h-full',
               cert.destacado ? 'border-4 border-yellow-400 shadow-yellow-400/60 relative' : ''
@@ -122,6 +147,7 @@ export default {
   data() {
     return {
       modules: [Navigation, Pagination],
+      categoriaCertificados: 'normales',
       certificados: [
         { nombre: 'Cuenta historias con los datos', file: 'CertificadoDeFinalizacion_Aprende data science Cuenta historias con los datos (1).pdf', url: '/Certificados/CertificadoDeFinalizacion_Aprende%20data%20science%20Cuenta%20historias%20con%20los%20datos%20(1).pdf', imagen: '/Certificados/aprendedatascience-CuentaHistorias.png' },
         { nombre: 'Certificado Microsoft', file: 'CertificadoMicrosoft.pdf', url: '/Certificados/CertificadoMicrosoft.pdf', imagen: '/Certificados/microsoft.png', destacado: true },
@@ -137,6 +163,17 @@ export default {
         { nombre: 'Fundamentos de IA y redes neuronales', file: 'CertificadoDeFinalizacion_Fundamentos de Inteligencia artificial Redes neuronales.pdf', url: '/Certificados/CertificadoDeFinalizacion_Fundamentos%20de%20Inteligencia%20artificial%20Redes%20neuronales.pdf', imagen: '/Certificados/Fundamentos.png' },
         { nombre: 'Depura el código Node', file: 'CertificadoDeFinalizacion_Depura el codigo Node.pdf', url: '/Certificados/CertificadoDeFinalizacion_Depura%20el%20codigo%20Node.pdf', imagen: '/Certificados/Depura.png' },
       ],
+      certificadosAcademicos: [
+        { nombre: 'Administración de Sistemas', file: 'Administración de Sistemas.pdf', url: encodeURI('/certificaciones santotomas/Administración de Sistemas.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Análisis de Datos', file: 'Análisis de Datos.pdf', url: encodeURI('/certificaciones santotomas/Análisis de Datos.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Arquitectura de Software', file: 'Arquitectura de Software.pdf', url: encodeURI('/certificaciones santotomas/Arquitectura de Software.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Diseño de Software y Base de Datos', file: 'Diseño de Software y Base de Datos.pdf', url: encodeURI('/certificaciones santotomas/Diseño de Software y Base de Datos.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Gestión de Proyectos Informáticos', file: 'Gestión de Proyectos Informáticos.pdf', url: encodeURI('/certificaciones santotomas/Gestión de Proyectos Informáticos.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Programación Avanzada', file: 'Programación Avanzada.pdf', url: encodeURI('/certificaciones santotomas/Programación Avanzada.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Programación Básica', file: 'Programación Básica.pdf', url: encodeURI('/certificaciones santotomas/Programación Básica.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Redes y Enrutamiento', file: 'Redes y Enrutamiento.pdf', url: encodeURI('/certificaciones santotomas/Redes y Enrutamiento.pdf'), imagen: '/Santotomas.png' },
+        { nombre: 'Seguridad Informática', file: 'Seguridad Informática.pdf', url: encodeURI('/certificaciones santotomas/Seguridad Informática.pdf'), imagen: '/Santotomas.png' },
+      ],
       trayectoria: [
         { year: '2022', title: 'Primer trabajo', subtitle: 'Desarrollador Web Jr.', desc: 'Comencé mi carrera profesional en una empresa de tecnología, aprendiendo y creciendo en el mundo del desarrollo web.' },
         { year: '2023', title: 'Certificación Vue.js', subtitle: '', desc: 'Obtuve mi primera certificación en Vue.js, consolidando mis conocimientos en frameworks modernos.' },
@@ -149,6 +186,11 @@ export default {
       hackatonModalOpen: false,
       hackatonModalImg: '',
       hackatonModalDesc: '',
+    }
+  },
+  computed: {
+    certificadosActivos() {
+      return this.categoriaCertificados === 'academicos' ? this.certificadosAcademicos : this.certificados;
     }
   },
   mounted() {
