@@ -25,8 +25,11 @@
           <!-- Botones debajo de la foto -->
           <div class="flex flex-col items-center gap-3 w-full mb-8">
             <div class="flex items-center justify-center gap-3">
-              <a href="https://github.com/NachoOFC" target="_blank" rel="noopener" class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
+              <a href="https://github.com/NachoOFC" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub" class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
                 <img src="/iconos/github_dark.svg" alt="GitHub" class="w-7 h-7" />
+              </a>
+              <a href="https://www.linkedin.com/in/ignacio-perez-a145b3300/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn" class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
+                <span class="w-7 h-7 flex items-center justify-center font-extrabold text-blue-400 text-lg leading-none">in</span>
               </a>
               <a href="/curriculum-informatica.pdf" target="_blank" rel="noopener" class="px-5 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-green-400 hover:to-blue-500 text-white rounded-full font-bold shadow transition text-center text-sm">Currículum</a>
               <div class="flex items-center gap-2 bg-gray-800 px-4 py-1 rounded-full shadow border border-gray-700">
