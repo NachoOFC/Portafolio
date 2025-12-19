@@ -111,11 +111,12 @@ export default {
         { label: 'Nuxt', icon: '/iconos/nuxt.svg' },
         { label: 'Vue', icon: '/iconos/vue.svg' },
         { label: 'JavaScript', icon: '/iconos/javascript.svg' },
+        { label: 'Tailwind CSS', icon: '/iconos/tailwindcss.svg' },
         { label: 'PostgreSQL', icon: '/iconos/postgresql.svg' },
         { label: 'GitHub', icon: '/iconos/github_dark.svg' }
       ],
       techIcons: [
-        'nuxt.svg', 'vue.svg', 'javascript.svg', 'postgresql.svg', 'github_dark.svg', 'react_dark.svg', 'astro_dark.svg', 'python.svg', 'php_dark.svg', 'firebase.svg', 'graphql.svg', 'java.svg', 'html5.svg', 'css_old.svg', 'tailwindcss.svg'
+        'nuxt.svg', 'vue.svg', 'javascript.svg', 'tailwindcss.svg', 'postgresql.svg', 'github_dark.svg', 'netlify.svg', 'vscode.svg', 'react_dark.svg', 'astro_dark.svg', 'python.svg', 'php_dark.svg', 'firebase.svg', 'graphql.svg', 'java.svg', 'html5.svg', 'css_old.svg'
       ]
     }
   },
@@ -266,7 +267,7 @@ export default {
     transform: translateX(0);
   }
   to {
-    transform: translateX(calc(-1 * (40px + 1.5rem) * 15));
+    transform: translateX(calc(-1 * (40px + 1.5rem) * 16));
   }
 }
 .hover\:pause-scroll:hover {

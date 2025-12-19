@@ -384,6 +384,21 @@ export default {
           id: 'videojuego',
           titulo: 'Videojuego',
           imagen: '/Videojuego.png'
+        },
+        {
+          id: 'ust-reserve',
+          titulo: 'UST Reserve',
+          imagen: '/ust.png'
+        },
+        {
+          id: 'alogis',
+          titulo: 'Alogis',
+          imagen: '/alogis.png'
+        },
+        {
+          id: 'proximo-proyecto',
+          titulo: 'Próximo proyecto',
+          imagen: '/meme.png'
         }
       ],
       fotosDisponibles: [] // Se llenará dinámicamente

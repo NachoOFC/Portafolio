@@ -1,5 +1,5 @@
 <template>
-  <section class="py-12 bg-gray-900 text-white">
+  <section class="pt-12 pb-20 bg-gray-900 text-white">
     <div class="max-w-6xl mx-auto px-4">
       <h2 class="text-3xl font-bold text-gradient text-center mb-8">
         Proyectos
@@ -27,9 +27,66 @@
               <h3 class="text-xl font-bold mb-2">
                 {{ proyecto.titulo }}
               </h3>
+              <div v-if="proyecto.etiquetas?.length" class="flex flex-wrap gap-2 mb-3">
+                <span
+                  v-for="tag in proyecto.etiquetas"
+                  :key="tag"
+                  class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border border-gray-700 bg-gray-900 text-gray-200"
+                >
+                  {{ tag }}
+                </span>
+              </div>
               <p class="flex-grow text-gray-300 mb-4">
                 {{ proyecto.descripcion }}
               </p>
+              <div
+                v-if="proyecto.accesoPrueba"
+                class="mb-4 rounded-xl border border-gray-700 bg-gray-900/40 p-4"
+              >
+                <p class="text-sm font-semibold text-gray-200 mb-3">
+                  Acceso de prueba
+                </p>
+
+                <div class="space-y-3">
+                  <div>
+                    <p class="text-xs text-gray-400 mb-1">Correo</p>
+                    <div class="flex gap-2">
+                      <input
+                        class="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                        type="text"
+                        :value="proyecto.accesoPrueba.correo"
+                        readonly
+                      />
+                      <button
+                        type="button"
+                        class="shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                        @click="copyToClipboard(proyecto.accesoPrueba.correo, `${i}-correo`)"
+                      >
+                        {{ copiedKey === `${i}-correo` ? 'Copiado' : 'Copiar' }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="text-xs text-gray-400 mb-1">Contraseña</p>
+                    <div class="flex gap-2">
+                      <input
+                        class="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                        type="text"
+                        :value="proyecto.accesoPrueba.password"
+                        readonly
+                      />
+                      <button
+                        type="button"
+                        class="shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                        @click="copyToClipboard(proyecto.accesoPrueba.password, `${i}-password`)"
+                      >
+                        {{ copiedKey === `${i}-password` ? 'Copiado' : 'Copiar' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <!-- Tecnologías -->
               <div class="flex flex-wrap gap-2 mb-2">
                 <span v-for="tech in proyecto.tecnologias" :key="tech" class="flex items-center bg-gray-900 text-gray-200 rounded-full px-3 py-1 text-sm font-medium gap-2 border border-gray-900">
@@ -42,8 +99,9 @@
                 </span>
               </div>
               <!-- Botones: dinámicos según tipo de proyecto -->
-              <div class="mt-2 flex gap-3">
+              <div v-if="proyecto.link || proyecto.demo" class="mt-2 flex gap-3">
                 <a
+                  v-if="proyecto.link"
                   :href="proyecto.link"
                   target="_blank"
                   rel="noopener"
@@ -78,18 +136,26 @@
 export default {
   data() {
     return {
+      copiedKey: null,
+      copyTimeoutId: null,
       proyectos: [
         {
           titulo: 'Sistema de Monitoreo de Activos',
           descripcion:
-            'Plataforma web para monitoreo y gestión de activos, alertas y reportes en tiempo real. Pueden probar correo: nacho@gmail.com / contraseña: nacho1234*',
+            'Plataforma web orientada al monitoreo y la gestión de activos, con generación de alertas y reportes en tiempo real.',
+          etiquetas: ['Web', '#monitoreo', '#reportes'],
+          accesoPrueba: {
+            correo: 'nacho@gmail.com',
+            password: 'nacho1234*'
+          },
           link: 'https://smtr-web.netlify.app/principal',
           imagen: '/image.png',
-          tecnologias: ['JavaScript', 'Nuxt', 'Vue']
+          tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
         },
         {
           titulo: 'Landing\u00A0Page',
           descripcion: 'Landing page creada en colaboración con mi equipo (actualmente en desarrollo), enfocada en mostrar nuestras ofertas, servicios y soluciones web orientadas a distintos tipos de clientes.',
+          etiquetas: ['Web', '#landing', 'En desarrollo'],
           link: 'https://moon-systems.netlify.app/',
           imagen: '/moon.png',
           tecnologias: ['Astro', 'React']
@@ -97,15 +163,73 @@ export default {
         {
           titulo: 'Videojuego',
           descripcion: 'Un videojuego desarrollado con Python en mis años de aprendizaje. dejo el repositorio con el codigo del juego',
+          etiquetas: ['#videojuego', 'Web'],
           link: 'https://github.com/NachoOFC/Videojuego',
           demo: 'https://eljarl.netlify.app/',
           imagen: '/Videojuego.png',
-          tecnologias: ['Python']
+          tecnologias: ['Python', 'VS Code']
+        },
+        {
+          titulo: 'UST Reserve',
+          descripcion: 'Aplicación web en desarrollo. Enlace disponible para revisión y pruebas de interfaz.',
+          etiquetas: ['Web', 'En desarrollo'],
+          link: 'https://ust-reserve.netlify.app/',
+          imagen: '/ust.png',
+          tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
+        },
+        {
+          titulo: 'Alogis',
+          descripcion: 'Proyecto web en desarrollo. Versión preliminar disponible para exploración.',
+          etiquetas: ['Web', 'En desarrollo'],
+          link: 'https://alogis.netlify.app/',
+          imagen: '/alogis.png',
+          tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
+        },
+        {
+          titulo: 'Próximo proyecto',
+          descripcion: 'Proyecto en desarrollo. Enlace y detalles próximamente.',
+          etiquetas: ['Web', 'En desarrollo'],
+          link: null,
+          imagen: '/meme.png',
+          tecnologias: []
         }
       ]
     }
   },
   methods: {
+    async copyToClipboard(text, key) {
+      if (!text) return
+
+      const setCopied = () => {
+        this.copiedKey = key
+        if (this.copyTimeoutId) clearTimeout(this.copyTimeoutId)
+        this.copyTimeoutId = setTimeout(() => {
+          this.copiedKey = null
+          this.copyTimeoutId = null
+        }, 1500)
+      }
+
+      try {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text)
+          setCopied()
+          return
+        }
+
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'absolute'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+        setCopied()
+      } catch (e) {
+        // Sin feedback extra: si falla, simplemente no cambia a "Copiado".
+      }
+    },
     getTechIcon(tech) {
       const iconMap = {
         'JavaScript': '/iconos/javascript.svg',
@@ -113,6 +237,8 @@ export default {
         'Vue': '/iconos/vue.svg',
         'Astro': '/iconos/astro_dark.svg',
         'React': '/iconos/react_dark.svg',
+        'Tailwind CSS': '/iconos/tailwindcss.svg',
+        'VS Code': '/iconos/vscode.svg',
         'Python': '/iconos/python.svg',
         'PostgreSQL': '/iconos/postgresql.svg'
       }
