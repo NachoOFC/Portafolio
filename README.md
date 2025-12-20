@@ -1,72 +1,53 @@
-# Nuxt Minimal Starter
+﻿# Portafolio - NachoOFC
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Este repositorio contiene mi portafolio personal (sitio web) hecho con **Nuxt 3**.
 
-## Setup
+## ¿Qué vas a encontrar?
 
-Make sure to install dependencies:
+- Secciones como "Sobre mi", "Habilidades", "Trayectoria" y proyectos.
+- Componentes reutilizables y estilos con Tailwind.
+- Funciones serverless para features simples (Netlify Functions).
+
+## Tecnologías
+
+- Nuxt 3 / Vue 3
+- TypeScript
+- Tailwind CSS
+- Netlify (deploy + functions)
+
+## Cómo correrlo
+
+Instala dependencias:
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+Levanta el servidor de desarrollo:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+Build de producción:
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview del build:
 
 ```bash
-# npm
 npm run preview
+```
 
-# pnpm
-pnpm preview
+## Deploy
 
-# yarn
-yarn preview
+Está pensado para desplegarse en **Netlify**. La configuración está en `netlify.toml` y las funciones en `netlify/functions/`.
 
-# bun
-bun run preview
+## Estructura rápida
+
+- `pages/`: rutas (home, proyectos, etc.)
+- `components/`: componentes del sitio
+- `assets/`: estilos y recursos
+- `netlify/functions/`: endpoints serverless
