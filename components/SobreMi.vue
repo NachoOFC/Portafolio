@@ -21,7 +21,7 @@
                 class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
                 <img src="/iconos/github_dark.svg" alt="GitHub" class="w-7 h-7" />
               </a>
-              <a href="https://www.linkedin.com/in/ignacio-perez-a145b3300/" target="_blank" rel="noopener"
+              <a href="https://www.linkedin.com/in/ignacio-perez-olavarria/" target="_blank" rel="noopener"
                 aria-label="LinkedIn" title="LinkedIn"
                 class="bg-gray-800 hover:bg-gray-700 rounded-full p-3 transition shadow border border-gray-700 flex items-center justify-center">
                 <span
