@@ -186,12 +186,12 @@ export default {
           tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
         },
         {
-          titulo: 'Próximo proyecto',
-          descripcion: 'Proyecto en desarrollo. Enlace y detalles próximamente.',
-          etiquetas: ['Web', 'En desarrollo'],
-          link: null,
-          imagen: '/meme.png',
-          tecnologias: []
+          titulo: 'Mini Juegos',
+          descripcion: 'Mini juegos en construcción. Por el momento incluye el juego del gato y el ahorcado.',
+          etiquetas: ['Web', 'En construcción'],
+          link: 'https://mini-juegos.netlify.app/',
+          imagen: '/logoNacho.png',
+          tecnologias: ['HTML', 'CSS', 'JavaScript']
         }
       ]
     }
@@ -232,6 +232,8 @@ export default {
     },
     getTechIcon(tech) {
       const iconMap = {
+        'HTML': '/iconos/html5.svg',
+        'CSS': '/iconos/css_old.svg',
         'JavaScript': '/iconos/javascript.svg',
         'Nuxt': '/iconos/nuxt.svg',
         'Vue': '/iconos/vue.svg',
