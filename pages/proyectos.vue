@@ -39,50 +39,63 @@
               <p class="flex-grow text-gray-300 mb-4">
                 {{ proyecto.descripcion }}
               </p>
-              <div
-                v-if="proyecto.accesoPrueba"
-                class="mb-4 rounded-xl border border-gray-700 bg-gray-900/40 p-4"
-              >
-                <p class="text-sm font-semibold text-gray-200 mb-3">
-                  Acceso de prueba
-                </p>
+              <div v-if="proyecto.accesoPrueba" class="mb-4">
+                <button
+                  type="button"
+                  class="w-full bg-gray-900/40 hover:bg-gray-900/60 text-gray-200 font-semibold py-2 px-4 rounded-xl transition border border-gray-700"
+                  :aria-expanded="!!accesoAbierto[i]"
+                  :aria-controls="`acceso-prueba-${i}`"
+                  @click="toggleAccesoPrueba(i)"
+                >
+                  {{ accesoAbierto[i] ? 'Ocultar credenciales' : 'Ver credenciales' }}
+                </button>
 
-                <div class="space-y-3">
-                  <div>
-                    <p class="text-xs text-gray-400 mb-1">Correo</p>
-                    <div class="flex gap-2">
-                      <input
-                        class="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-                        type="text"
-                        :value="proyecto.accesoPrueba.correo"
-                        readonly
-                      />
-                      <button
-                        type="button"
-                        class="shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
-                        @click="copyToClipboard(proyecto.accesoPrueba.correo, `${i}-correo`)"
-                      >
-                        {{ copiedKey === `${i}-correo` ? 'Copiado' : 'Copiar' }}
-                      </button>
+                <div
+                  v-if="accesoAbierto[i]"
+                  :id="`acceso-prueba-${i}`"
+                  class="mt-3 rounded-xl border border-gray-700 bg-gray-900/40 p-4"
+                >
+                  <p class="text-sm font-semibold text-gray-200 mb-3">
+                    Acceso de prueba
+                  </p>
+
+                  <div class="space-y-3">
+                    <div>
+                      <p class="text-xs text-gray-400 mb-1">Correo</p>
+                      <div class="flex gap-2">
+                        <input
+                          class="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                          type="text"
+                          :value="proyecto.accesoPrueba.correo"
+                          readonly
+                        />
+                        <button
+                          type="button"
+                          class="shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                          @click="copyToClipboard(proyecto.accesoPrueba.correo, `${i}-correo`)"
+                        >
+                          {{ copiedKey === `${i}-correo` ? 'Copiado' : 'Copiar' }}
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <p class="text-xs text-gray-400 mb-1">Contraseña</p>
-                    <div class="flex gap-2">
-                      <input
-                        class="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-                        type="text"
-                        :value="proyecto.accesoPrueba.password"
-                        readonly
-                      />
-                      <button
-                        type="button"
-                        class="shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
-                        @click="copyToClipboard(proyecto.accesoPrueba.password, `${i}-password`)"
-                      >
-                        {{ copiedKey === `${i}-password` ? 'Copiado' : 'Copiar' }}
-                      </button>
+                    <div>
+                      <p class="text-xs text-gray-400 mb-1">Contraseña</p>
+                      <div class="flex gap-2">
+                        <input
+                          class="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                          type="text"
+                          :value="proyecto.accesoPrueba.password"
+                          readonly
+                        />
+                        <button
+                          type="button"
+                          class="shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                          @click="copyToClipboard(proyecto.accesoPrueba.password, `${i}-password`)"
+                        >
+                          {{ copiedKey === `${i}-password` ? 'Copiado' : 'Copiar' }}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -112,7 +125,7 @@
                       : 'bg-blue-600 hover:bg-blue-700'
                   ]"
                 >
-                  {{ proyecto.link.includes('github') ? 'Repositorio' : 'Ver más' }}
+                  {{ proyecto.link.includes('github') ? 'Repositorio' : 'Visitar sitio' }}
                 </a>
                 <a
                   v-if="proyecto.demo"
@@ -138,6 +151,7 @@ export default {
     return {
       copiedKey: null,
       copyTimeoutId: null,
+      accesoAbierto: {},
       proyectos: [
         {
           titulo: 'Sistema de Monitoreo de Activos',
@@ -153,12 +167,12 @@ export default {
           tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
         },
         {
-          titulo: 'Landing\u00A0Page',
-          descripcion: 'Landing page creada en colaboración con mi equipo (actualmente en desarrollo), enfocada en mostrar nuestras ofertas, servicios y soluciones web orientadas a distintos tipos de clientes.',
-          etiquetas: ['Web', '#landing', 'En desarrollo'],
-          link: 'https://moon-systems.netlify.app/',
-          imagen: '/moon.png',
-          tecnologias: ['Astro', 'React']
+          titulo: 'Mini Juegos',
+          descripcion: 'Mini juegos en construcción. Por el momento incluye el juego del gato y el ahorcado.',
+          etiquetas: ['Web', '#minijuegos', '#videojuegos'],
+          link: 'https://mini-juegos.netlify.app/',
+          imagen: '/logoNacho.png',
+          tecnologias: ['HTML', 'CSS', 'JavaScript']
         },
         {
           titulo: 'Videojuego',
@@ -186,17 +200,20 @@ export default {
           tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
         },
         {
-          titulo: 'Mini Juegos',
-          descripcion: 'Mini juegos en construcción. Por el momento incluye el juego del gato y el ahorcado.',
-          etiquetas: ['Web', 'En construcción'],
-          link: 'https://mini-juegos.netlify.app/',
-          imagen: '/logoNacho.png',
-          tecnologias: ['HTML', 'CSS', 'JavaScript']
+          titulo: 'Landing\u00A0Page',
+          descripcion: 'Landing page creada en colaboración con mi equipo (actualmente en desarrollo), enfocada en mostrar nuestras ofertas, servicios y soluciones web orientadas a distintos tipos de clientes.',
+          etiquetas: ['Web', '#landing', 'En desarrollo'],
+          link: 'https://moon-systems.netlify.app/',
+          imagen: '/moon.png',
+          tecnologias: ['Astro', 'React']
         }
       ]
     }
   },
   methods: {
+    toggleAccesoPrueba(index) {
+      this.accesoAbierto[index] = !this.accesoAbierto[index]
+    },
     async copyToClipboard(text, key) {
       if (!text) return
 

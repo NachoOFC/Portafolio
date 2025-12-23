@@ -396,9 +396,9 @@ export default {
           imagen: '/alogis.png'
         },
         {
-          id: 'proximo-proyecto',
-          titulo: 'Próximo proyecto',
-          imagen: '/meme.png'
+          id: 'mini-juegos',
+          titulo: 'Mini Juegos',
+          imagen: '/logoNacho.png'
         }
       ],
       fotosDisponibles: [] // Se llenará dinámicamente
