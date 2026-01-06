@@ -188,7 +188,7 @@
                   :href="proyecto.blogUrl"
                   target="_blank"
                   rel="noopener"
-                  class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                  class="inline-block bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition shadow"
                 >
                   📝 Ver Artículo
                 </a>
