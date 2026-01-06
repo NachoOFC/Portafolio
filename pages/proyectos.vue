@@ -7,7 +7,54 @@
       <p class="text-center mb-8 text-gray-300">
         Proyectos en constante actualización, mejorando la calidad y eficiencia.
       </p>
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+        <!-- Tarjeta del Blog -->
+        <div class="bg-gray-800 bg-opacity-90 text-white rounded-2xl shadow-lg h-full flex flex-col transition-transform duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-2xl border border-gray-700 overflow-hidden">
+          <!-- Imagen/Icono del Blog -->
+          <div class="w-full h-52 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+            <img
+              src="/feliz.png"
+              alt="Mi Blog"
+              class="max-h-full max-w-full object-contain"
+            />
+          </div>
+          <!-- Contenido -->
+          <div class="flex-1 flex flex-col p-6">
+            <h3 class="text-xl font-bold mb-2">
+              Mi Blog
+            </h3>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border border-gray-700 bg-gray-900 text-gray-200">
+                Blog
+              </span>
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border border-gray-700 bg-gray-900 text-gray-200">
+                #aprendizaje
+              </span>
+            </div>
+            <p class="flex-grow text-gray-300 mb-4">
+              Comparto mi experiencia desarrollando proyectos, aprendizajes y tips sobre programación.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="flex items-center bg-gray-900 text-gray-200 rounded-full px-3 py-1 text-sm font-medium gap-2 border border-gray-900">
+                <span>✍️</span>
+                <span class="ml-1">Hashnode</span>
+              </span>
+            </div>
+            <div class="mt-2 flex gap-3">
+              <a
+                href="https://nachoblog.hashnode.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+              >
+                Visitar Blog
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proyectos -->
         <div
           v-for="(proyecto, i) in proyectos"
           :key="proyecto.titulo"
@@ -112,7 +159,7 @@
                 </span>
               </div>
               <!-- Botones: dinámicos según tipo de proyecto -->
-              <div v-if="proyecto.link || proyecto.demo" class="mt-2 flex gap-3">
+              <div v-if="proyecto.link || proyecto.demo || proyecto.blogUrl" class="mt-2 flex gap-3 flex-wrap">
                 <a
                   v-if="proyecto.link"
                   :href="proyecto.link"
@@ -135,6 +182,15 @@
                   class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition shadow"
                 >
                   Ver juego
+                </a>
+                <a
+                  v-if="proyecto.blogUrl"
+                  :href="proyecto.blogUrl"
+                  target="_blank"
+                  rel="noopener"
+                  class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                >
+                  📝 Ver Artículo
                 </a>
               </div>
             </div>
@@ -163,6 +219,7 @@ export default {
             password: 'nacho1234*'
           },
           link: 'https://smtr-web.netlify.app/principal',
+          blogUrl: 'https://nachoblog.hashnode.dev/smtr-construyendo-un-sistema-de-monitoreo-electrico-en-tiempo-real',
           imagen: '/image.png',
           tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
         },
@@ -180,6 +237,7 @@ export default {
           etiquetas: ['#videojuego', 'Web'],
           link: 'https://github.com/NachoOFC/Videojuego',
           demo: 'https://eljarl.netlify.app/',
+          blogUrl: 'https://nachoblog.hashnode.dev/videojuego-python',
           imagen: '/Videojuego.png',
           tecnologias: ['Python', 'VS Code']
         },
