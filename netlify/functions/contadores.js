@@ -59,11 +59,58 @@ exports.handler = async (event) => {
       const body = JSON.parse(event.body);
       const { action, dispositivo_id, nombre, icono, mensaje } = body;
 
-      // Incrementar contadores
-      if (action === 'like' || action === 'visita') {
+      // Incrementar contador de likes
+      if (action === 'like' && dispositivo_id) {
+        // Verificar si ya dio like
+        const yaLike = await client.query(
+          'SELECT id FROM pagina_likes WHERE dispositivo_id = $1',
+          [dispositivo_id]
+        );
+
+        if (yaLike.rows.length > 0) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ error: 'Ya diste like a la página' })
+          };
+        }
+
+        // Registrar el like
+        await client.query(
+          'INSERT INTO pagina_likes (dispositivo_id) VALUES ($1)',
+          [dispositivo_id]
+        );
+
+        // Incrementar contador
         await client.query(
           'UPDATE contadores SET cantidad = cantidad + 1, actualizado_en = NOW() WHERE tipo = $1',
-          [action === 'like' ? 'likes' : 'visitas']
+          ['likes']
+        );
+
+        const result = await client.query(
+          'SELECT tipo, cantidad FROM contadores ORDER BY tipo'
+        );
+
+        const contadores = {};
+        result.rows.forEach(row => {
+          contadores[row.tipo] = row.cantidad;
+        });
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            likes: contadores.likes || 0,
+            visitas: contadores.visitas || 0
+          })
+        };
+      }
+
+      // Incrementar contador de visitas
+      if (action === 'visita') {
+        await client.query(
+          'UPDATE contadores SET cantidad = cantidad + 1, actualizado_en = NOW() WHERE tipo = $1',
+          ['visitas']
         );
 
         const result = await client.query(

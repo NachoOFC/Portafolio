@@ -718,10 +718,11 @@ export default {
           this.misLikes[id] = true;
           this.guardarMisLikes();
           
-          // Actualizar contador en comentario
+          // Actualizar contador en comentario y estado de like
           const comentario = this.comentarios.find(c => c.id === id);
           if (comentario) {
             comentario.likes = data.likes;
+            comentario.yaLike = true; // Actualizar estado de like en el comentario
           }
           
           // Reordenar comentarios por likes
@@ -769,6 +770,7 @@ export default {
           const comentario = this.comentarios.find(c => c.id === id);
           if (comentario) {
             comentario.likes = data.likes;
+            comentario.yaLike = false;
           }
           
           // Reordenar comentarios por likes

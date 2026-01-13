@@ -147,6 +147,9 @@ export default {
       this.enviarVisitaAlServidor();
     }
 
+    // Verificar si ya dio like
+    this.verificarSiYaDioLike();
+
     // Cargar contadores y TOP 1 comentario UNA SOLA VEZ al inicio
     this.obtenerContadoresDelServidor();
 
@@ -186,8 +189,15 @@ export default {
       
       this.deviceId = deviceId;
     },
+    verificarSiYaDioLike() {
+      // Verificar en localStorage
+      const likeLocal = localStorage.getItem(`portafolioLike_${this.deviceId}`);
+      if (likeLocal === 'true') {
+        this.yaLike = true;
+      }
+    },
     agregarLike() {
-      // Si ya dio like en las últimas 8 horas, no permitir
+      // Si ya dio like, no permitir
       if (this.yaLike) {
         return;
       }
@@ -195,6 +205,12 @@ export default {
       this.likes += 1;
       this.yaLike = true;
       this.likeReciente = true;
+      
+      // Guardar en localStorage
+      localStorage.setItem(`portafolioLike_${this.deviceId}`, 'true');
+      
+      // Enviar al servidor
+      this.enviarLikeAlServidor();
       
       // Animación
       setTimeout(() => {
@@ -217,14 +233,17 @@ export default {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'like'
+          action: 'like',
+          dispositivo_id: this.deviceId
         })
       })
       .then(res => res.json())
       .then(data => {
         this.likes = data.likes || 0;
       })
-      .catch(() => {});
+      .catch(err => {
+        console.error('Error al enviar like:', err);
+      });
     },
     enviarVisitaAlServidor() {
       const apiUrl = '/.netlify/functions/contadores';
