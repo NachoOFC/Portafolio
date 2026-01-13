@@ -50,6 +50,14 @@
               >
                 Visitar Blog
               </a>
+              <a
+                href="https://nachoblog.hashnode.dev/portafolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+              >
+                📝 Ver Artículo
+              </a>
             </div>
           </div>
         </div>
@@ -188,7 +196,7 @@
                   :href="proyecto.blogUrl"
                   target="_blank"
                   rel="noopener"
-                  class="inline-block bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg transition shadow"
+                  class="inline-block bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-4 rounded-lg transition shadow"
                 >
                   📝 Ver Artículo
                 </a>
@@ -228,6 +236,7 @@ export default {
           descripcion: 'Mini juegos en construcción. Por el momento incluye el juego del gato y el ahorcado.',
           etiquetas: ['Web', '#minijuegos', '#videojuegos'],
           link: 'https://mini-juegos.netlify.app/',
+          blogUrl: 'https://nachoblog.hashnode.dev/mini-juegos',
           imagen: '/logoNacho.png',
           tecnologias: ['HTML', 'CSS', 'JavaScript']
         },
