@@ -29,7 +29,8 @@ export default {
         { year: '2022', title: 'Universidad Santo Tomás', subtitle: 'Ingeniería en Informática', desc: 'Comencé mis estudios universitarios en la Universidad Santo Tomás, iniciando mi camino en la ingeniería en informática.' },
         { year: '2023', title: 'Enfoque en Python', subtitle: 'Campeonato de Python y Videojuego', desc: 'Me enfoqué en aprender Python, participando en campeonatos y desarrollando mi primer videojuego con este lenguaje.' },
         { year: '2024', title: 'Certificaciones y Freelance', subtitle: 'LinkedIn Learning & Web para negocios', desc: 'Obtuve certificaciones de LinkedIn y realicé cursos. Además, desarrollé páginas web para pequeños negocios locales y gané el 2º lugar en la Hackatón TICSUR 2024.', hackaton: true },
-        { year: '2025', title: 'Trabajo Real', subtitle: 'Desarrollador Web Jr. en VOID IT SOLUTIONS SPA (Remoto / Chile)', desc: 'Enero 2025 – Mayo 2025\n• Desarrollo de aplicaciones web con Vue.js, GraphQL y Hasura.\n• Integración de APIs y diseño de componentes interactivos.\n• Participación en reuniones ágiles (Scrum).\n• Mantenimiento y documentación de sistemas.' }
+        { year: '2025', title: 'Trabajo Real', subtitle: 'Desarrollador Web Jr. en VOID IT SOLUTIONS SPA (Remoto / Chile)', desc: 'Enero 2025 – Mayo 2025\n• Desarrollo de aplicaciones web con Vue.js, GraphQL y Hasura.\n• Integración de APIs y diseño de componentes interactivos.\n• Participación en reuniones ágiles (Scrum).\n• Mantenimiento y documentación de sistemas.' },
+        { year: '2026', title: 'Blog Personal y Proyectos', subtitle: 'Desarrollo Continuo', desc: 'Trabajando en proyectos personales pequeños mientras escribo artículos técnicos en mi blog, compartiendo conocimientos y experiencias en desarrollo web.' }
       ]
     }
   }
