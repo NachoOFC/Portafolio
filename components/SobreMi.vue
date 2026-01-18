@@ -4,7 +4,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-24 items-start">
         <!-- Columna izquierda: Foto y botones -->
         <div class="flex flex-col items-center">
-          <!-- Foto de perfil rotante -->
+          <!-- Foto de perfil rotante  osiosi-->
           <div class="relative w-48 h-48 mb-6 perspective">
             <img v-if="mostrarFotoAnimada" src="/nachoanimado.png" alt="Nacho Animado"
               class="w-48 h-48 object-cover rounded-2xl border-4 border-gradient shadow-lg transition-opacity duration-500"
