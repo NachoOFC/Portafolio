@@ -86,7 +86,7 @@ export default {
     const animatedTech = ref(0)
     const animatedCertificates = ref(0)
     const targetExperience = 2
-    const targetProjects = 8
+    const targetProjects = 10
     const targetTech = 15
     const targetCertificates = 65
     let hasAnimated = false
