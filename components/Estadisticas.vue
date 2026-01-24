@@ -88,7 +88,7 @@ export default {
     const targetExperience = 2
     const targetProjects = 8
     const targetTech = 15
-    const targetCertificates = 21
+    const targetCertificates = 65
     let hasAnimated = false
 
     const animateCounters = () => {
