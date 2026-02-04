@@ -32,7 +32,7 @@ npm run dev
 
 El proyecto está configurado para Netlify. Si usas el sistema de comentarios, necesitas la variable:
 
-```
+```env
 DATABASE_URL=postgresql://user:password@host:port/database
 ```
 
