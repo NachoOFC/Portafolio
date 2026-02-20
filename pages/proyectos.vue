@@ -74,7 +74,7 @@
                 v-if="proyecto.imagen"
                 :src="proyecto.imagen"
                 :alt="proyecto.titulo"
-                class="w-full h-full object-cover"
+                :class="['w-full h-full', proyecto.imagenEstilo === 'contain' ? 'object-contain p-4' : 'object-cover']"
               />
             </div>
             <!-- Contenido -->
@@ -267,12 +267,21 @@ export default {
           tecnologias: ['JavaScript', 'Nuxt', 'Vue', 'Tailwind CSS']
         },
         {
-          titulo: 'Landing\u00A0Page',
-          descripcion: 'Landing page creada en colaboración con mi equipo (actualmente en desarrollo), enfocada en mostrar nuestras ofertas, servicios y soluciones web orientadas a distintos tipos de clientes.',
-          etiquetas: ['Web', '#landing', 'En desarrollo'],
-          link: 'https://moon-systems.netlify.app/',
-          imagen: '/moon.png',
+          titulo: 'Bro-Systems',
+          descripcion: 'Landing page creada en colaboración con mi equipo, enfocada en mostrar nuestras ofertas, servicios y soluciones web orientadas a distintos tipos de clientes.',
+          etiquetas: ['Web', '#landing'],
+          link: 'https://bro-systems.netlify.app/',
+          imagen: '/codebros.png',
           tecnologias: ['Astro', 'React']
+        },
+        {
+          titulo: 'Code Motivator',
+          descripcion: 'Extensión para VS Code desplegada en el Marketplace oficial. Motivación mientras codeas.',
+          etiquetas: ['Extensión', '#vscode', '#marketplace'],
+          link: 'https://marketplace.visualstudio.com/items?itemName=nacho-ofc.code-motivator',
+          imagen: '/logoextencion.png',
+          imagenEstilo: 'contain',
+          tecnologias: ['VS Code']
         }
       ]
     }

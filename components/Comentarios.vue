@@ -288,7 +288,8 @@
                 :src="proyecto.imagen"
                 :alt="proyecto.titulo"
                 :class="[
-                  'w-full h-24 object-cover group-hover:scale-110 transition',
+                  'w-full h-24 group-hover:scale-110 transition',
+                  proyecto.imagenEstilo === 'contain' ? 'object-contain p-2' : 'object-cover',
                   proyecto.id === 'videojuego' ? 'object-bottom' : 'object-center'
                 ]"
               />
@@ -376,9 +377,9 @@ export default {
           imagen: '/image.png'
         },
         {
-          id: 'landing',
-          titulo: 'Landing Page',
-          imagen: '/moon.png'
+          id: 'bro-systems',
+          titulo: 'Bro-Systems',
+          imagen: '/codebros.png'
         },
         {
           id: 'videojuego',
@@ -399,6 +400,12 @@ export default {
           id: 'mini-juegos',
           titulo: 'Mini Juegos',
           imagen: '/logoNacho.png'
+        },
+        {
+          id: 'code-motivator',
+          titulo: 'Code Motivator',
+          imagen: '/logoextencion.png',
+          imagenEstilo: 'contain'
         }
       ],
       fotosDisponibles: [] // Se llenará dinámicamente
