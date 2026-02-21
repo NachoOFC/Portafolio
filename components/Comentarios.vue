@@ -906,12 +906,12 @@ export default {
       const referencias = [];
       
       // Patrón para proyectos: #proyectos:smtr
-      const proyectoPattern = /#proyectos:([a-zA-Z0-9\-_]+)/g;
+      const proyectoPattern = /#proyectos:([a-zA-Z0-9\-_]+)/gi;
       let match;
       
       while ((match = proyectoPattern.exec(mensaje)) !== null) {
-        const proyectoId = match[1];
-        const proyecto = this.proyectos.find(p => p.id === proyectoId);
+        const proyectoId = match[1].toLowerCase();
+        const proyecto = this.proyectos.find(p => p.id.toLowerCase() === proyectoId);
         
         if (proyecto) {
           referencias.push({
