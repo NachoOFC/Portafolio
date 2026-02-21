@@ -563,6 +563,19 @@ export default {
               if (!comentario.referencias || comentario.referencias.length === 0) {
                 comentario.referencias = this.extraerReferenciasDelMensaje(comentario.mensaje);
               }
+              
+              // ACTUALIZAR URLs de proyectos con datos actuales (por si cambiaron las imágenes)
+              if (comentario.referencias && comentario.referencias.length > 0) {
+                comentario.referencias.forEach(ref => {
+                  if (ref.tipo === 'proyecto') {
+                    const proyecto = this.proyectos.find(p => p.id.toLowerCase() === ref.nombre.toLowerCase());
+                    if (proyecto) {
+                      ref.url = proyecto.imagen; // Actualizar con la imagen actual
+                      ref.titulo = proyecto.titulo;
+                    }
+                  }
+                });
+              }
             });
             
             // Sincronizar likes desde el backend
