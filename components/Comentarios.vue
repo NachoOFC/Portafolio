@@ -40,13 +40,15 @@
               v-for="ico in iconos"
               :key="ico"
               @click="nuevoComentario.icono = ico"
+              :aria-label="'Seleccionar icono ' + ico.replace('.png', '').replace('.gif', '')"
+              :aria-pressed="nuevoComentario.icono === ico"
               :class="[
                 'p-2 rounded border-2 transition',
                 nuevoComentario.icono === ico
                   ? 'border-blue-500 bg-blue-500/20'
                   : 'border-gray-600 hover:border-gray-500'
               ]"
-              :title="ico.replace('.png', '')"
+              :title="ico.replace('.png', '').replace('.gif', '')"
             >
               <img
                 :src="`/comentarios/${ico}`"
@@ -61,12 +63,14 @@
         <div class="mb-4 flex gap-2 flex-wrap">
           <button
             @click="mostrarSelectorProyectos = true"
+            aria-label="Abrir selector de proyectos"
             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-semibold transition flex items-center gap-2"
           >
             📁 Comentar Proyecto
           </button>
           <button
             @click="mostrarSelectorFotos = true"
+            aria-label="Abrir selector de fotos"
             class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-semibold transition flex items-center gap-2"
           >
             🖼️ Comentar Foto
@@ -168,6 +172,7 @@
                     <button
                       @click="editarComentario(comentario.id)"
                       :disabled="enviando"
+                      aria-label="Editar comentario"
                       class="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded transition"
                       title="Editar"
                     >
@@ -176,6 +181,7 @@
                     <button
                       @click="borrarComentario(comentario.id)"
                       :disabled="enviando"
+                      aria-label="Borrar comentario"
                       class="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded transition"
                       title="Borrar"
                     >
@@ -190,7 +196,32 @@
 
         <h3 class="text-xl font-semibold mb-4">Comentarios ({{ comentariosAprobados.length }})</h3>
         
-        <div v-if="comentariosAprobados.length === 0" class="text-center text-gray-400 py-8">
+        <!-- Skeleton de carga -->
+        <div v-if="cargandoComentarios" class="space-y-4">
+          <div v-for="n in 3" :key="n" class="bg-gray-800 rounded-lg p-4 border border-gray-700 animate-pulse">
+            <div class="flex gap-3">
+              <!-- Avatar skeleton -->
+              <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-gray-700"></div>
+              </div>
+              <!-- Contenido skeleton -->
+              <div class="flex-grow space-y-2">
+                <div class="flex items-center gap-2">
+                  <div class="h-4 bg-gray-700 rounded w-24"></div>
+                  <div class="h-3 bg-gray-700 rounded w-16"></div>
+                </div>
+                <div class="space-y-2">
+                  <div class="h-3 bg-gray-700 rounded w-full"></div>
+                  <div class="h-3 bg-gray-700 rounded w-4/5"></div>
+                  <div class="h-3 bg-gray-700 rounded w-3/5"></div>
+                </div>
+                <div class="h-6 bg-gray-700 rounded w-16 mt-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else-if="comentariosAprobados.length === 0" class="text-center text-gray-400 py-8">
           Aún no hay comentarios. ¡Sé el primero! 💬
         </div>
 
@@ -236,6 +267,7 @@
                       <img
                         :src="ref.url"
                         :alt="ref.titulo"
+                        loading="lazy"
                         :class="[
                           'w-full h-full object-cover',
                           ref.tipo === 'proyecto' && ref.nombre === 'videojuego' ? 'object-bottom' : 'object-center'
@@ -249,6 +281,7 @@
                 <div class="mt-2 flex items-center gap-2">
                   <button
                     @click="toggleLikeComentario(comentario.id)"
+                    :aria-label="misLikes[comentario.id] ? 'Quitar me gusta' : 'Dar me gusta'"
                     :class="[
                       'text-xs px-3 py-1 rounded transition',
                       misLikes[comentario.id]
@@ -348,6 +381,7 @@ export default {
         referencias: [] // Array de referencias { tipo, nombre, url }
       },
       enviando: false,
+      cargandoComentarios: true,
       puedeComentar: false,
       dispositivo_id: null,
       iconos: [
@@ -510,6 +544,7 @@ export default {
       return fetch(url)
         .then(res => res.json())
         .then(data => {
+          this.cargandoComentarios = false;
           // Filtrar para solo obtener comentarios válidos
           if (Array.isArray(data)) {
             this.comentarios = data.filter(c => c.id && c.nombre && c.mensaje && c.creado_en);

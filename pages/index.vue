@@ -75,7 +75,7 @@
                 class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded-full text-xs shadow">Destacado</span>
               <div class="w-full h-52 bg-gray-900 flex items-center justify-center overflow-hidden group cursor-pointer"
                 @click="abrirModal(cert.imagen, cert.nombre)" tabindex="0">
-                <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre"
+                <img v-if="cert.imagen" :src="cert.imagen" :alt="cert.nombre" loading="lazy"
                   class="object-contain rounded-lg shadow max-h-48 max-w-full px-2 transition-transform duration-300 group-hover:scale-110" />
                 <svg v-else-if="cert.file.endsWith('.pdf')" xmlns="http://www.w3.org/2000/svg"
                   class="h-12 w-12 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
