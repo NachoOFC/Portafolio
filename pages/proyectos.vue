@@ -5,7 +5,8 @@
         Proyectos
       </h2>
       <p class="text-center mb-4 text-gray-300">
-        Proyectos en constante actualización, mejorando la calidad y eficiencia.
+        Proyectos en constante actualización, mejorando la calidad y eficiencia. 
+        Paginas webs, juegos y extensiones para compartir mi aprendizaje y experiencia en el desarrollo de software.
       </p>
 
       <!-- Filtros -->
